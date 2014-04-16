@@ -1,0 +1,10 @@
+*.crt
+*.DS_Store
+*.key
+*.patch
+*~
+.ep_initialized
+email.json
+!email.json.template
+node_modules
+npm-debug.log
