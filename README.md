@@ -17,7 +17,7 @@ If you do that, you can follow this procedure after that:
 4. enter correct data in email.json (see email.json section)
 5. restart etherpad
 
-Don't forget to create the database tables (with [create_tables.sql](sql/migrate_tables.sql)) at some point if not already present or migrate from previous versions ([migrate_tables.sql](sql/migrate_tables.sql)).
+Don't forget to create the database tables (with [create_tables.sql](sql/create_tables.sql)) at some point if not already present or migrate from previous versions (with [modify_tables.sql](sql/modify_tables.sql)).
 
 
 ## Migration
@@ -26,7 +26,7 @@ There has been a database transformation which includes:
 * changed primary keys
 * introduced constraints (foreign keys)
 
-All database changes are possible on a existing installation and can be automated using the provided [migrate_tables.sql](sql/migrate_tables.sql) file. Please be aware that all rows violating foreign constraints will be deleted. In our migration of a 4GB database, ZERO rows were deleted.
+All database changes are possible on a existing installation and can be automated using the provided [modify_tables.sql](sql/modify_tables.sql) file. Please be aware that all rows violating foreign constraints will be deleted. In our migration of a 4GB database, ZERO rows were deleted.
 
 ## email.json
 
