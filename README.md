@@ -17,6 +17,8 @@ If you do that, you can follow this procedure after that:
 4. enter correct data in email.json (see email.json section)
 5. restart etherpad
 
+Dont forget to create the database tables at some point if not already present or migrate from previous versions.
+
 ## Migration
 There has been a database transformation which includes:
 * changed column names
