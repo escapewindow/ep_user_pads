@@ -12,19 +12,27 @@
  See the License for the specific language governing permissions and
  limitations under the License. */
 
-function group(hooks, context, cb) {
-    var socket, loc = document.location, port = loc.port == "" ? (loc.protocol == "https:" ? 443
-            : 80)
-            : loc.port, url = loc.protocol + "//"
-            + loc.hostname + ":" + port + "/", pathComponents = location.pathname
-            .split('/'),
-    // Strip admin/plugins
-        baseURL = pathComponents.slice(0,
-            pathComponents.length - 4).join('/')
-            + '/', resource = baseURL.substring(1)
-            + "socket.io";
+/* 
+ convenience methods
+ */
 
-    socket = io.connect(url, {resource: resource}).of("/pluginfw/admin/user_pad");
+
+
+function getSocket(pattern, offset) {
+    console.log('getting ', pattern, ' with offset ', offset);
+    var loc = document.location,
+        port = loc.port == "" ? (loc.protocol == "https:" ? 443 : 80) : loc.port,
+        url = loc.protocol + "//" + loc.hostname + ":" + port + "/",
+        pathComponents = location.pathname.split('/'),
+        baseURL = pathComponents.slice(0, pathComponents.length - offset).join('/') + '/',
+        resource = baseURL.substring(1) + "socket.io";
+    return window['io'].connect(url, {resource: resource}).of(pattern);
+}
+
+
+//function group(hooks, context, cb) {
+function group() {
+    var socket = getSocket("/pluginfw/admin/user_pad", 4);
 
     var currentPads = [];
     var currentUser = [];
@@ -61,8 +69,8 @@ function group(hooks, context, cb) {
             paar = paare[i].split("=");
             name = paar[0];
             wert = paar[1];
-            name = unescape(name).replace("+", " ");
-            wert = unescape(wert).replace("+", " ");
+            name = decodeURIComponent(name).replace("+", " ");
+            wert = decodeURIComponent(wert).replace("+", " ");
             this[name] = wert;
         }
     }
@@ -250,24 +258,14 @@ function group(hooks, context, cb) {
 
     searchPads('');
     searchUsers('');
-};
+}
 
 
 ////////////////////////////////////////////////////////////////////////////
 
-function groups(hooks, context, cb) {
-    var socket, loc = document.location, port = loc.port == "" ? (loc.protocol == "https:" ? 443
-            : 80)
-            : loc.port, url = loc.protocol + "//"
-            + loc.hostname + ":" + port + "/", pathComponents = location.pathname
-            .split('/'),
-    // Strip admin/plugins
-        baseURL = pathComponents.slice(0,
-            pathComponents.length - 3).join('/')
-            + '/', resource = baseURL.substring(1)
-            + "socket.io";
-
-    socket = io.connect(url, {resource: resource}).of("/pluginfw/admin/user_pad");
+//function groups(hooks, context, cb) {
+function groups() {
+    var socket = getSocket("/pluginfw/admin/user_pad", 3);
     var currentGroups = [];
 
     var sortByIdAsc = function (a, b) {
@@ -293,10 +291,10 @@ function groups(hooks, context, cb) {
         return 0; //default return value (no sorting)
     };
     var sortByAmountAuthorsAsc = function (a, b) {
-        return a.amAuthors - b.amAuthors;
+        return a['amAuthors'] - b['amAuthors'];
     };
     var sortByAmountAuthorsDesc = function (a, b) {
-        return b.amAuthors - a.amAuthors;
+        return b['amAuthors'] - a['amAuthors'];
     };
 
     var searchGroup = function (searchTerm) {
@@ -315,7 +313,29 @@ function groups(hooks, context, cb) {
             }
         });
     };
+    
+    var showGroups = function (groups, sortFunc) {
+        groups.sort(sortFunc);
+        var widget = $('.group-results-div');
+        var resultList = widget.find('.group-results');
+        resultList.html("");
+        for (var i = 0; i < groups.length; i++) {
+            var row = widget.find('.template tr').clone();
+            row.find(".ID").html('<a class="groupID">' + groups[i].id + '</a>');
+            row.find(".Name").html('<a href = "groups/group?id=' + groups[i].id + '" class="groupName">' + groups[i].name + '</a>');
+            row.find(".Authors").html(groups[i]['amAuthors']);
+            row.find(".deleteButton").bind('click', function (e) {
+                var row = $(e.target).closest("tr");
+                var id = row.find('.groupID').html();
+                socket.emit("delete-group", id, function () {
+                    searchGroup('');
+                });
+            });
+            resultList.append(row);
+        }
 
+    };
+    
     function handlers() {
         $('.sort.up').unbind('click').click(function (e) {
             var row = $(e.target).closest("th");
@@ -346,53 +366,18 @@ function groups(hooks, context, cb) {
             addGroup($("#name-of-group").val());
         });
     }
-
+    
     handlers();
-
-    var showGroups = function (groups, sortFunc) {
-        groups.sort(sortFunc);
-        var widget = $('.group-results-div');
-        var resultList = widget.find('.group-results');
-        resultList.html("");
-        for (var i = 0; i < groups.length; i++) {
-            var row = widget.find('.template tr').clone();
-            row.find(".ID").html('<a class="groupID">' + groups[i].id + '</a>');
-            row.find(".Name").html('<a href = "groups/group?id=' + groups[i].id + '" class="groupName">' + groups[i].name + '</a>');
-            row.find(".Authors").html(groups[i].amAuthors);
-            row.find(".deleteButton").bind('click', function (e) {
-                var row = $(e.target).closest("tr");
-                var id = row.find('.groupID').html();
-                socket.emit("delete-group", id, function () {
-                    searchGroup('');
-                });
-            });
-            resultList.append(row);
-        }
-
-    };
-
     searchGroup('');
-
 }
 
 
 ////////////////////////////////////////////////////////////////////////////
 
 
-function users(hooks, context, cb) {
-    var socket, loc = document.location, port = loc.port == "" ? (loc.protocol == "https:" ? 443
-            : 80)
-            : loc.port, url = loc.protocol + "//"
-            + loc.hostname + ":" + port + "/", pathComponents = location.pathname
-            .split('/'),
-    // Strip admin/plugins
-        baseURL = pathComponents.slice(0,
-            pathComponents.length - 3).join('/')
-            + '/', resource = baseURL.substring(1)
-            + "socket.io";
-
-    socket = io.connect(url, {resource: resource}).of("/pluginfw/admin/user_pad");
-
+//function users(hooks, context, cb) {
+function users() {
+    var socket = getSocket("/pluginfw/admin/user_pad", 3);
     var currentUsers = [];
 
     var sortByIdAsc = function (a, b) {
@@ -418,10 +403,10 @@ function users(hooks, context, cb) {
         return 0; //default return value (no sorting)
     };
     var sortByAmountGroupsAsc = function (a, b) {
-        return a.amGroups - b.amGroups;
+        return a['amGroups'] - b['amGroups'];
     };
     var sortByAmountGroupsDesc = function (a, b) {
-        return b.amGroups - a.amGroups;
+        return b['amGroups'] - a['amGroups'];
     };
 
     var searchUser = function (searchTerm) {
@@ -486,7 +471,7 @@ function users(hooks, context, cb) {
             var row = widget.find('.template tr').clone();
             row.find(".ID").html('<a class="userID">' + users[i].id + '</a>');
             row.find(".Name").html('<a href = "users/user?id=' + users[i].id + '" class="userName">' + users[i].name + '</a>');
-            row.find(".Groups").html(users[i].amGroups);
+            row.find(".Groups").html((users[i] || {})['amGroups']);
             row.find(".deleteButton").bind('click', function (e) {
                 var row = $(e.target).closest("tr");
                 var id = row.find('.userID').html();
@@ -496,7 +481,8 @@ function users(hooks, context, cb) {
                         var conf = confirm("The User is owner of one ore more groups. Are you sure to delete this user?");
                         if (conf == true) {
                             hard = true;
-                            socket.emit("delete-user", id, hard, function (isOwner) {
+                            //socket.emit("delete-user", id, hard, function (isOwner) {
+                            socket.emit("delete-user", id, hard, function () {
                                 searchUser('');
                             });
                         }
@@ -530,7 +516,8 @@ function users(hooks, context, cb) {
                     var id = row.find('.userID').html();
                     var val = {};
                     val.id = id;
-                    socket.emit("deactivate-user", val, function (retval) {
+                    //socket.emit("deactivate-user", val, function (retval) {
+                    socket.emit("deactivate-user", val, function () {
                         document.location.reload();
                     });
                 });
@@ -543,7 +530,8 @@ function users(hooks, context, cb) {
                     var id = row.find('.userID').html();
                     var val = {};
                     val.id = id;
-                    socket.emit("activate-user", val, function (retval) {
+                    //socket.emit("activate-user", val, function (retval) {
+                    socket.emit("activate-user", val, function () {
                         document.location.reload();
                     });
                 });
@@ -559,21 +547,9 @@ function users(hooks, context, cb) {
 ///////////////////////////////////////////////////////////////////
 
 
-function user(hooks, context, cb) {
-    var socket, loc = document.location, port = loc.port == "" ? (loc.protocol == "https:" ? 443
-            : 80)
-            : loc.port, url = loc.protocol + "//"
-            + loc.hostname + ":" + port + "/", pathComponents = location.pathname
-            .split('/'),
-
-    // Strip admin/plugins
-        baseURL = pathComponents.slice(0,
-            pathComponents.length - 4).join('/')
-            + '/', resource = baseURL.substring(1)
-            + "socket.io";
-//	console.log(resource);
-
-    socket = io.connect(url, {resource: resource}).of("/pluginfw/admin/user_pad");
+//function user(hooks, context, cb) {
+function user() {
+    var socket = getSocket("/pluginfw/admin/user_pad", 4);
 
     var currentGroups = [];
 
@@ -609,8 +585,8 @@ function user(hooks, context, cb) {
             paar = paare[i].split("=");
             name = paar[0];
             wert = paar[1];
-            name = unescape(name).replace("+", " ");
-            wert = unescape(wert).replace("+", " ");
+            name = encodeURIComponent(name).replace("+", " ");
+            wert = encodeURIComponent(wert).replace("+", " ");
             this[name] = wert;
         }
     }
@@ -726,53 +702,42 @@ function user(hooks, context, cb) {
             });
             resultList.append(row);
         }
-
     };
-
     socket.on('search-all-groups-from-user-result', function (user) {
         showGroupsGroupBox(user);
     });
     searchAllGroupsOfUser('');
 }
 
-function index(hooks, context, cb) {
-    var socket,
-        loc = document.location,
-        port = loc.port == "" ? (loc.protocol == "https:" ? 443 : 80) : loc.port,
-        url = loc.protocol + "//" + loc.hostname + ":" + port + "/",
-        pathComponents = location.pathname.split('/'),
-        baseURL = pathComponents.slice(0, pathComponents.length - 1).join('/') + '/',
-        resource = baseURL.substring(1) + "socket.io";
 
-    socket = io.connect(url, {resource: resource}).of("/pluginfw/user_pads_unlogged");
-    function handlers() {
-    }
-
-    handlers();
+function index() {
+    
 }
 
 
-exports.documentReady = function (hooks, context, cb) {
+//exports.documentReady = function (hooks, context, cb) {
+// todo: use callback
+exports.documentReady = function (hooks, context) {
+    console.log('executing context: ', JSON.stringify(context));
     switch (context) {
         case("admin/user_pad_groups"):
-            groups(hooks, context, cb);
+            groups();
             break;
         case("admin/user_pad_group"):
-            group(hooks, context, cb);
+            group();
             break;
         case("admin/user_pad_users"):
-            users(hooks, context, cb);
+            users();
             break;
         case("admin/user_pad_user"):
-            user(hooks, context, cb);
+            user();
             break;
         case("user_pads/index"):
-            index(hooks, context, cb);
+            index();
             break;
         default:
-            //console.log('ep_user_pads: context not found.');
-            index(hooks, context, cb);
-        // dont do anything
+            console.log('ep_user_pads: context not found.');
+            getSocket("/pluginfw/user_pads_unlogged", 3);
     }
 };
 
