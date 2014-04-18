@@ -15,8 +15,7 @@
 /* 
  convenience methods
  */
-function getSocket(pattern, offset) {
-    console.log('getting ', pattern, ' with offset ', offset);
+function getSocket(pattern) {
     var url = document.location.origin;
     var resource = 'socket.io';
     return window['io'].connect(url, {resource: resource}).of(pattern);
@@ -25,7 +24,7 @@ function getSocket(pattern, offset) {
 
 //function group(hooks, context, cb) {
 function group() {
-    var socket = getSocket("/pluginfw/admin/user_pad", 4);
+    var socket = getSocket("/pluginfw/admin/user_pad");
 
     var currentPads = [];
     var currentUser = [];
@@ -252,7 +251,7 @@ function group() {
 
 //function groups(hooks, context, cb) {
 function groups() {
-    var socket = getSocket("/pluginfw/admin/user_pad", 3);
+    var socket = getSocket("/pluginfw/admin/user_pad");
     var currentGroups = [];
 
     var sortByIdAsc = function (a, b) {
@@ -361,7 +360,7 @@ function groups() {
 
 //function users(hooks, context, cb) {
 function users() {
-    var socket = getSocket("/pluginfw/admin/user_pad", 3);
+    var socket = getSocket("/pluginfw/admin/user_pad");
     var currentUsers = [];
 
     var sortByIdAsc = function (a, b) {
@@ -530,7 +529,7 @@ function users() {
 
 //function user(hooks, context, cb) {
 function user() {
-    var socket = getSocket("/pluginfw/admin/user_pad", 4);
+    var socket = getSocket("/pluginfw/admin/user_pad");
 
     var currentGroups = [];
 
@@ -718,7 +717,7 @@ exports.documentReady = function (hooks, context) {
             break;
         default:
             console.log('ep_user_pads: context not found.');
-            getSocket("/pluginfw/user_pads_unlogged", 3);
+            getSocket("/pluginfw/user_pads_unlogged");
     }
 };
 

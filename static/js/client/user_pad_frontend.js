@@ -12,19 +12,21 @@
  See the License for the specific language governing permissions and
  limitations under the License. */
 
+/* 
+ convenience methods
+ */
+function getSocket(pattern) {
+    var url = document.location.origin;
+    var resource = 'socket.io';
+    return window['io'].connect(url, {resource: resource}).of(pattern);
+}
 
 function index(hooks, context, cb) {
-    var socket, loc = document.location, 
-        port = loc.port == "" ? (loc.protocol == "https:" ? 443 : 80) : loc.port,
-        url = loc.protocol + "//" + loc.hostname + ":" + port + "/",
-        pathComponents = location.pathname.split('/'),
-        // Strip admin/plugins
-        baseURL = pathComponents.slice(0, pathComponents.length - 1).join('/')
-            + '/', resource = baseURL.substring(1) + "socket.io";
-    
-    socket = io.connect(url, {resource: resource}).of("/pluginfw/user_pads_unlogged");
+    getSocket("/pluginfw/user_pads_unlogged");
 
-    function handlers() {}
+    function handlers() {
+    }
+
     handlers();
 }
 
