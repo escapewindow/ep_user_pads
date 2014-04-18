@@ -79,13 +79,13 @@ settings.encryptPassword = function (password, salt, cb) {
 var log = function (type, message) {
     if (typeof message == 'string') {
         if (type == 'error') {
-            console.error(pkg.name, ':', message);
+            console.error(pkg.name, message);
         } else if (type == 'debug') {
             if (DEBUG_ENABLED) {
-                console.log('(debug)', pkg.name, ':', +message);
+                console.log('(debug)', pkg.name, message);
             }
         } else {
-            console.log(pkg.name + ': ' + message);
+            console.log(pkg.name + message);
         }
     }
     else console.log(message);
