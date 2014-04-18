@@ -14,7 +14,7 @@
 
 
 /*
-    REQUIRES
+ REQUIRES
  */
 var path = require('path');
 var eejs = require('ep_etherpad-lite/node/eejs');
@@ -36,14 +36,14 @@ var formidable = require("formidable");
 
 
 /* 
-    email settings 
-*/
+ email settings 
+ */
 var nodemailer = require('nodemailer');
 var node_mailer_transport = nodemailer.createTransport("sendmail");
 
 
 /*
-    CONSTANTS
+ CONSTANTS
  */
 var DEBUG_ENABLED = true;
 var USER_EXISTS = 'User already Exists';
@@ -53,7 +53,7 @@ var PW_EMPTY = 'Password is empty';
 
 
 /*
-    CONFIG
+ CONFIG
  */
 var dbAuth = settings.dbSettings;
 var dbAuthParams = {
@@ -79,10 +79,10 @@ settings.encryptPassword = function (password, salt, cb) {
 var log = function (type, message) {
     if (typeof message == 'string') {
         if (type == 'error') {
-            console.error(pkg.name + ': ' + message);
+            console.error(pkg.name, ':', message);
         } else if (type == 'debug') {
             if (DEBUG_ENABLED) {
-                console.log('(debug) ' + pkg.name + ': ' + message);
+                console.log('(debug)', pkg.name, ':', +message);
             }
         } else {
             console.log(pkg.name + ': ' + message);
@@ -407,7 +407,7 @@ function deleteGroupFromEtherpad(id, cb) {
 
             var sql = "DELETE FROM store where store.key = ?";
             pool.query(sql, ["mapper2group:" + id], function (err, res) {
-                defaulthandler(err, res, function() {
+                defaulthandler(err, res, function () {
                     cb(true);
                 })
             });
@@ -435,8 +435,8 @@ function sendError(error, res) {
     res.send(data);
 }
 
-var sendEmail = function(message) {
-    if (DEBUG_ENABLED){
+var sendEmail = function (message) {
+    if (DEBUG_ENABLED) {
         log('debug', 'DEBUG MODE, SKIPPING E-MAIL SENDING');
         return;
     }
@@ -993,11 +993,10 @@ exports.socketio = function (hook_name, args, cb) {
 // todo: merge
 
 
-
 exports.expressCreateServer = function (hook_name, args, cb) {
     /*
-        ADMIN PART
-    */
+     ADMIN PART
+     */
     args.app.get('/admin/userpadadmin', function (req, res) {
         res.send(eejs.require("ep_user_pads/templates/admin/user_pad_admin.ejs", {errors: []}));
     });
@@ -1013,10 +1012,10 @@ exports.expressCreateServer = function (hook_name, args, cb) {
     args.app.get('/admin/userpadadmin/users/user', function (req, res) {
         res.send(eejs.require("ep_user_pads/templates/admin/user_pad_admin_user.ejs", {errors: []}));
     });
-    
+
     /*
-        FRONTEND PART
-    */
+     FRONTEND PART
+     */
     args.app.get('/index.html', function (req, res) {
         var authenticated = userAuthenticated(req);
         if (authenticated) {

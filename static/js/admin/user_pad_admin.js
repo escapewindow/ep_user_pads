@@ -15,17 +15,10 @@
 /* 
  convenience methods
  */
-
-
-
 function getSocket(pattern, offset) {
     console.log('getting ', pattern, ' with offset ', offset);
-    var loc = document.location,
-        port = loc.port == "" ? (loc.protocol == "https:" ? 443 : 80) : loc.port,
-        url = loc.protocol + "//" + loc.hostname + ":" + port + "/",
-        pathComponents = location.pathname.split('/'),
-        baseURL = pathComponents.slice(0, pathComponents.length - offset).join('/') + '/',
-        resource = baseURL.substring(1) + "socket.io";
+    var url = document.location.origin;
+    var resource = 'socket.io';
     return window['io'].connect(url, {resource: resource}).of(pattern);
 }
 
@@ -69,8 +62,8 @@ function group() {
             paar = paare[i].split("=");
             name = paar[0];
             wert = paar[1];
-            name = decodeURIComponent(name).replace("+", " ");
-            wert = decodeURIComponent(wert).replace("+", " ");
+            name = decodeURIComponent(name);
+            wert = decodeURIComponent(wert);
             this[name] = wert;
         }
     }
@@ -186,16 +179,11 @@ function group() {
             var row = widget.find('.template tr').clone();
             row.find(".Name").html(pads[i].name);
             row.find(".Name").bind('click', function (e) {
-//				console.log(document.location);
                 var list = new Werteliste(document.location.search);
                 var pad_name = $(e.target).closest(".Name");
-//				console.log(pad_name.html());
                 socket.emit('direct-to-group-pad', 'admin', list.id, pad_name.html(), function (session, group, pad_name) {
-//					console.log(session);
-//					console.log(group);
                     document.cookie = "sessionID=" + session + "; path=/";
                     var padurl = url + "p/" + group + "$" + pad_name;
-//					console.log(padurl);
                     window.location.replace(padurl);
 
                 });
@@ -261,7 +249,6 @@ function group() {
 }
 
 
-////////////////////////////////////////////////////////////////////////////
 
 //function groups(hooks, context, cb) {
 function groups() {
@@ -370,9 +357,6 @@ function groups() {
     handlers();
     searchGroup('');
 }
-
-
-////////////////////////////////////////////////////////////////////////////
 
 
 //function users(hooks, context, cb) {
@@ -544,9 +528,6 @@ function users() {
 }
 
 
-///////////////////////////////////////////////////////////////////
-
-
 //function user(hooks, context, cb) {
 function user() {
     var socket = getSocket("/pluginfw/admin/user_pad", 4);
@@ -585,8 +566,8 @@ function user() {
             paar = paare[i].split("=");
             name = paar[0];
             wert = paar[1];
-            name = encodeURIComponent(name).replace("+", " ");
-            wert = encodeURIComponent(wert).replace("+", " ");
+            name = encodeURIComponent(name);
+            wert = encodeURIComponent(wert);
             this[name] = wert;
         }
     }

@@ -40,13 +40,17 @@ div.leftwrapper ul {
 
 div.rightwrapper {
 	float: left;
-	width: 85%;
-	
-	
+	min-width: 85%;
 }
+
+.innerwrapper {
+    display: inline-block !important;
+}
+
 .sort {
   cursor: pointer;
 }
+
 .sort:after {
   content: '▲▼'
 }
