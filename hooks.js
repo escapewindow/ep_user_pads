@@ -383,6 +383,7 @@ function addPadToEtherpad(padName, groupId, cb) {
             return;
         }
         groupManager.createGroupPad(group, padName, function (err) {
+            log('debug', [group, padName]);
             if (err) {
                 log('error', 'something went wrong while adding a group pad');
                 cb()
@@ -644,7 +645,7 @@ exports.socketio = function (hook_name, args, cb) {
             var allSql = "SELECT u.name as name, u.id as userID " +
                 "FROM User as u " +
                 "WHERE NOT EXISTS " +
-                "(Select 1 from UserGroup as g where g.user_id = u.id and g.group_id = ?)";
+                "(Select 1 from UserGroup as g where g.user_id = u.id andg.id = ?)";
             pool.query(allSql, [vals.groupid], function (err, res) {
                 defaulthandler(err, res, cb)
             });
@@ -924,9 +925,9 @@ exports.socketio = function (hook_name, args, cb) {
 
         // search-groups-of-user
         socket.on("search-groups-of-user", function (searchTerm, cb) {
-            var allSql = "SELECT g.group_id AS id, g.name AS name " +
+            var allSql = "SELECTg.id AS id, g.name AS name " +
                 "FROM Groups AS g " +
-                "JOIN UserGroup AS ug on g.group_id = ug.group_id " +
+                "JOIN UserGroup AS ug ong.id = ug.group_id " +
                 "WHERE ug.user_id = ?";
             pool.query(allSql, [searchTerm.id], function (err, res) {
                 defaulthandler(err, res, cb)
@@ -952,10 +953,10 @@ exports.socketio = function (hook_name, args, cb) {
         // search-groups-not-in-user
         // means: search for groups that the user is not in
         socket.on("search-groups-not-in-user", function (vals, cb) {
-            var allSql = "SELECT g.name, g.group_id AS id " +
+            var allSql = "SELECT g.name,g.id AS id " +
                 "FROM Groups AS g " +
                 "WHERE NOT EXISTS " +
-                "(SELECT 1 FROM UserGroup AS ug WHERE ug.group_id = g.group_id AND ug.user_id = 3)";
+                "(SELECT 1 FROM UserGroup AS ug WHERE ug.group_id =g.id AND ug.user_id = 3)";
             pool.query(allSql, [vals.id, "%" + vals.name + "%"], function (err, res) {
                 defaulthandler(err, res, cb)
             });
