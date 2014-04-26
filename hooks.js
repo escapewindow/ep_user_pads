@@ -222,8 +222,10 @@ function existValueInDatabase(sql, params, cb) {
             log('error', 'existValueInDatabase error, sql: ' + sql);
             cb(false);
         } else if (!found || found.length == 0) {
+            log('debug', 'existValueInDatabase false');
             cb(false);
         } else {
+            log('debug', 'existValueInDatabase true');
             cb(true);
         }
     });
@@ -681,8 +683,8 @@ exports.socketio = function (hook_name, args, cb) {
 
         // delete-pad
         socket.on("delete-pad", function (name, groupid, cb) {
-            var deletePadSql = "DELETE FROM GroupPads WHERE GroupPads.group_id = ?";
-            pool.query(deletePadSql, [name, groupid], function (err) {
+            var deletePadSql = "DELETE FROM GroupPads WHERE GroupPads.group_id = ? and GroupPads.pad_name = ?";
+            pool.query(deletePadSql, [groupid, name], function (err) {
                 if (err) {
                     mySqlErrorHandler(err);
                     cb(null);
@@ -728,27 +730,33 @@ exports.socketio = function (hook_name, args, cb) {
         // add-pad-to-group
         // todo: remove existValueInDatabase and replace with insert error handling
         socket.on("add-pad-to-group", function (padGroup, cb) {
-            if (padGroup.groupid == "" || padGroup.padName == "")
+            log('debug', ["adding pad to group", padGroup]);
+            
+            if (padGroup.groupid == "" || padGroup.padName == "") {
+                log('error', ["add-pad-to-group", "failed to add pad", padGroup]);
                 cb(false);
-            var existPadInGroupSql = "SELECT * from GroupPads as gp where gp.group_id = ?";
-            existValueInDatabase(existPadInGroupSql, [padGroup.groupid], function (exists) {
-                    if (exists) {
+                return;
+            }
+            
+            var existPadInGroupSql = "SELECT * from GroupPads as gp where gp.group_id = ? and gp.pad_name = ?";
+            existValueInDatabase(existPadInGroupSql, [padGroup.groupid, padGroup.padName], function (exists) {
+                if (exists) {
+                    log('error', ["add-pad-to-group", "already exists", padGroup]);
+                    cb(false);
+                    return;
+                }
+                var addPadToGroupSql = "INSERT INTO GroupPads VALUES(?, ?)";
+                pool.query(addPadToGroupSql, [padGroup.groupid, padGroup.padName], function (err) {
+                    if (err) {
+                        mySqlErrorHandler(err);
                         cb(false);
                         return;
                     }
-                    var addPadToGroupSql = "INSERT INTO GroupPads VALUES(?, ?)";
-                    pool.query(addPadToGroupSql, [padGroup.groupid, padGroup.padName], function (err) {
-                        if (err) {
-                            mySqlErrorHandler(err);
-                            cb(false);
-                        } else {
-                            addPadToEtherpad(padGroup.padName, padGroup.groupid, function () {
-                                cb(true);
-                            });
-                        }
+                    addPadToEtherpad(padGroup.padName, padGroup.groupid, function () {
+                        cb(true);
                     });
-                }
-            )
+                });
+            })
         });
 
         // add-user-to-group

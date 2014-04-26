@@ -26,9 +26,7 @@ limitations under the License. -->
     <script type="text/javascript">
         (function () {
             var pathComponents = location.pathname.split('/');
-            var baseURL = pathComponents.slice(0, pathComponents.length - 4).join(
-                    '/')
-                    + '/';
+            var baseURL = pathComponents.slice(0, pathComponents.length - 4).join('/')+ '/';
             require.setRootURI(baseURL + "javascripts/src");
             require.setLibraryURI(baseURL + "javascripts/lib");
             require.setGlobalKeyPath("require");
