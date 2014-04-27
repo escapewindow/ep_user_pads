@@ -54,8 +54,8 @@ limitations under the License. */
  }
  
  #GroupBox {
- 
- 	height: 400px;
+     min-height: 500px;
+     min-width: 500px;
  }
  
   .close-btn {
@@ -80,9 +80,9 @@ limitations under the License. */
 	color: white;
 	text-decoration: none;
 }
-.whitebox-result-div{
-	position: relative;
-	max-height: 70%;
-	width: 100%;
-	overflow: auto;
+.whitebox-result-div {
+    position: relative;
+    max-height: 95%;
+    width: 100%;
+    overflow: auto;
 }

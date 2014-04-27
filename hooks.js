@@ -933,9 +933,9 @@ exports.socketio = function (hook_name, args, cb) {
 
         // search-groups-of-user
         socket.on("search-groups-of-user", function (searchTerm, cb) {
-            var allSql = "SELECTg.id AS id, g.name AS name " +
+            var allSql = "SELECT g.id AS id, g.name AS name " +
                 "FROM Groups AS g " +
-                "JOIN UserGroup AS ug ong.id = ug.group_id " +
+                "JOIN UserGroup AS ug on g.id = ug.group_id " +
                 "WHERE ug.user_id = ?";
             pool.query(allSql, [searchTerm.id], function (err, res) {
                 defaulthandler(err, res, cb)
@@ -946,15 +946,15 @@ exports.socketio = function (hook_name, args, cb) {
         // todo: remove existValueInDatabase
         socket.on("add-group-to-user", function (userGroup, cb) {
             var existGroupInUserSql = "SELECT * from UserGroup where UserGroup.group_id = ? and UserGroup.user_id = ?";
-            existValueInDatabase(existGroupInUserSql, [userGroup.groupid, userGroup.userid], function (bool) {
+            existValueInDatabase(existGroupInUserSql, [userGroup.groupid, userGroup.userID], function (bool) {
                 if (bool) {
                     cb(false);
-                } else {
-                    var addGroupToUserSql = "INSERT INTO UserGroup VALUES(?,?,2)";
-                    pool.query(addGroupToUserSql, [userGroup.userid, userGroup.groupid], function (err, res) {
-                        defaulthandler(err, res, cb);
-                    });
+                    return;
                 }
+                var addGroupToUserSql = "INSERT INTO UserGroup VALUES(?,?,2)";
+                pool.query(addGroupToUserSql, [userGroup.userID, userGroup.groupid], function (err, res) {
+                    defaulthandler(err, res, cb);
+                });
             });
         });
 
@@ -964,7 +964,7 @@ exports.socketio = function (hook_name, args, cb) {
             var allSql = "SELECT g.name,g.id AS id " +
                 "FROM Groups AS g " +
                 "WHERE NOT EXISTS " +
-                "(SELECT 1 FROM UserGroup AS ug WHERE ug.group_id =g.id AND ug.user_id = 3)";
+                "(SELECT 1 FROM UserGroup AS ug WHERE ug.group_id = g.id AND ug.user_id = 3)";
             pool.query(allSql, [vals.id, "%" + vals.name + "%"], function (err, res) {
                 defaulthandler(err, res, cb)
             });
