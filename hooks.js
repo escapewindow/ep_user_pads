@@ -555,24 +555,21 @@ function mapAuthorWithDBKey(mapperkey, mapper, callback) {
 
         //there is no author with this mapper, so create one
         if (author == null) {
-            exports.createAuthor(null, function (err, author) {
-                if (ERR(err, callback)) return;
-
+            authorManager.createAuthor(null, function (err, author) {
                 //create the token2author relation
                 db.set(mapperkey + ":" + mapper, author.authorID);
 
                 //return the author
                 callback(null, author);
             });
+            return;
         }
         //there is a author with this mapper
-        else {
-            //update the timestamp of this author
-            db.setSub("globalAuthor:" + author, ["timestamp"], new Date().getTime());
+        //update the timestamp of this author
+        db.setSub("globalAuthor:" + author, ["timestamp"], new Date().getTime());
 
-            //return the author
-            callback(null, {authorID: author});
-        }
+        //return the author
+        callback(null, {authorID: author});
     });
 }
 
@@ -647,7 +644,7 @@ exports.socketio = function (hook_name, args, cb) {
             var allSql = "SELECT u.name as name, u.id as userID " +
                 "FROM User as u " +
                 "WHERE NOT EXISTS " +
-                "(Select 1 from UserGroup as g where g.user_id = u.id andg.id = ?)";
+                "(Select 1 from UserGroup as ug where ug.user_id = u.id and ug.group_id = ?)";
             pool.query(allSql, [vals.groupid], function (err, res) {
                 defaulthandler(err, res, cb)
             });
@@ -699,7 +696,7 @@ exports.socketio = function (hook_name, args, cb) {
         // suspend-user-from-group
         socket.on("suspend-user-from-group", function (usergroup, cb) {
             var deleteUserSql = "DELETE FROM UserGroup where UserGroup.user_id = ? and UserGroup.group_id = ?";
-            pool.query(deleteUserSql, [usergroup.user_id, usergroup.group_id], function (err, res) {
+            pool.query(deleteUserSql, [usergroup.userid, usergroup.groupid], function (err, res) {
                 defaulthandler(err, res, cb)
             });
         });
@@ -731,13 +728,13 @@ exports.socketio = function (hook_name, args, cb) {
         // todo: remove existValueInDatabase and replace with insert error handling
         socket.on("add-pad-to-group", function (padGroup, cb) {
             log('debug', ["adding pad to group", padGroup]);
-            
+
             if (padGroup.groupid == "" || padGroup.padName == "") {
                 log('error', ["add-pad-to-group", "failed to add pad", padGroup]);
                 cb(false);
                 return;
             }
-            
+
             var existPadInGroupSql = "SELECT * from GroupPads as gp where gp.group_id = ? and gp.pad_name = ?";
             existValueInDatabase(existPadInGroupSql, [padGroup.groupid, padGroup.padName], function (exists) {
                 if (exists) {
@@ -763,16 +760,16 @@ exports.socketio = function (hook_name, args, cb) {
         // todo: remove existValueInDatabase and replace with insert error handling
         socket.on("add-user-to-group", function (userGroup, cb) {
             var existPadInGroupSql = "SELECT * from UserGroup where UserGroup.group_id = ? and UserGroup.user_id = ?";
-            existValueInDatabase(existPadInGroupSql, [userGroup.group_id, userGroup.user_id], function (bool) {
+            existValueInDatabase(existPadInGroupSql, [userGroup.groupid, userGroup.userID], function (bool) {
                 if (bool) {
                     cb(false);
-                } else {
-                    var addPadToGroupSql = "INSERT INTO UserGroup VALUES(?, ?, 2)";
-                    pool.query(addPadToGroupSql, [userGroup.user_id, userGroup.group_id], function (err, res) {
-                        defaulthandler(err, res, cb)
-                    });
+                    return;
                 }
-            });
+                var addPadToGroupSql = "INSERT INTO UserGroup VALUES(?, ?, 2)";
+                pool.query(addPadToGroupSql, [userGroup.userID, userGroup.groupid], function (err, res) {
+                    defaulthandler(err, res, cb)
+                });
+            })
         });
 
         // search-all-user
@@ -783,7 +780,6 @@ exports.socketio = function (hook_name, args, cb) {
             pool.query(allSql, ["%" + searchTerm + "%"], function (err, res) {
                 defaulthandler(err, res, cb)
             });
-
         });
 
         // add-user
@@ -793,19 +789,23 @@ exports.socketio = function (hook_name, args, cb) {
             existValueInDatabase(existUser, [user.name], function (exists) {
                 if (exists) {
                     cb(false, 'User already exists!');
-                } else {
-                    var addUserSql = "";
-                    createSalt(function (salt) {
-                        encryptPassword(user.pw, salt, function (encrypted) {
-                            addUserSql = "INSERT INTO User VALUES(null, ?,?,1,0,'Change This Name','klfdsa',?,1)";
-                            pool.query(addUserSql, [user.name, encrypted, salt], function (newUser) {
-                                addUserToEtherpad(newUser.insertId, function () {
-                                    cb(true, 'User added!');
-                                });
-                            })
-                        });
-                    })
+                    return;
                 }
+                createSalt(function (salt) {
+                    encryptPassword(user.pw, salt, function (encrypted) {
+                        var addUserSql = "INSERT INTO User VALUES(null, ?,?,1,0,'Change This Name','klfdsa',?,1)";
+                        pool.query(addUserSql, [user.name, encrypted, salt], function (err, newUser) {
+                            if (err) {
+                                mySqlErrorHandler(err);
+                                cb(false);
+                                return;
+                            }
+                            addUserToEtherpad(newUser.insertId, function () {
+                                cb(true, 'User added!');
+                            });
+                        })
+                    });
+                })
             });
         });
 
@@ -946,12 +946,12 @@ exports.socketio = function (hook_name, args, cb) {
         // todo: remove existValueInDatabase
         socket.on("add-group-to-user", function (userGroup, cb) {
             var existGroupInUserSql = "SELECT * from UserGroup where UserGroup.group_id = ? and UserGroup.user_id = ?";
-            existValueInDatabase(existGroupInUserSql, [userGroup.group_id, userGroup.user_id], function (bool) {
+            existValueInDatabase(existGroupInUserSql, [userGroup.groupid, userGroup.userid], function (bool) {
                 if (bool) {
                     cb(false);
                 } else {
                     var addGroupToUserSql = "INSERT INTO UserGroup VALUES(?,?,2)";
-                    pool.query(addGroupToUserSql, [userGroup.user_id, userGroup.group_id], function (err, res) {
+                    pool.query(addGroupToUserSql, [userGroup.userid, userGroup.groupid], function (err, res) {
                         defaulthandler(err, res, cb);
                     });
                 }
