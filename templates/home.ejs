@@ -1,4 +1,4 @@
-<!-- Copyright 2014 Alexander Oberegger
+<!-- Copyright 2014 Alexander Oberegger, Igor Skoric
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,35 +17,13 @@ limitations under the License. -->
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title lang="en">Etherpad</title>
-    <link type="text/css" href="./static/plugins/ep_user_pads/static/css/styles.css" rel="stylesheet"/>
-
+    <link type="text/css" href="/static/plugins/ep_user_pads/static/css/styles.css" rel="stylesheet"/>
+    <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,700" rel="stylesheet" type="text/css">
 </head>
 <body>
 <div id="wrapper">
-    <header>
-        <div class="inside">
-            <nav id="mainMenu">
-                <ul>
-                    <li><span class="active" lang="en">Home</span></li>
-                    <li class="separator">|</li>
-                    <li><a href="pads.html" lang="en">Public Pads</a></li>
-                    <li class="separator">|</li>
-                    <li><a href="groups.html" lang="en">My Groups</a></li>
-                    <li class="separator">|</li>
-                    <li><a href="help.html" lang="en">Help</a></li>
-                </ul>
-            </nav>
-            <nav id="sekMenu">
-                <ul>
-                    <li><a lang="en" id="userProfile"><%= username %></a></li>
-                    <li class="separator">|</li>
-                    <li><a href="#" lang="en" id="logout">Logout</a></li>
-                </ul>
-            </nav>
-            <img src="./static/plugins/ep_user_pads/static/images/logo_tug_grey_white-01.png" alt="Etherpad"
-                 id="logo">
-        </div>
-    </header>
+    <%- header %>
+
     <div id="main">
         <div class="inside">
             <span id="loggedInTitle" lang="en">University Pad</span>
@@ -54,7 +32,7 @@ limitations under the License. -->
 
             <div class="leftArea">
                 <div class="headline">
-                    <img src="./static/plugins/ep_user_pads/static/images/pad-32.png" class="headlineImage"
+                    <img src="/static/plugins/ep_user_pads/static/images/pad-32.png" class="headlineImage"
                          alt="Register">
 
                     <h1 lang="en">Public Pad</h1>
@@ -68,7 +46,7 @@ limitations under the License. -->
             </div>
             <div class="rightArea">
                 <div class="headline">
-                    <img src="./static/plugins/ep_user_pads/static/images/users-cyan-32.png"
+                    <img src="/static/plugins/ep_user_pads/static/images/users-cyan-32.png"
                          class="headlineImage" alt="Register">
 
                     <h1 lang="en">Private Groups</h1>
@@ -102,17 +80,13 @@ limitations under the License. -->
             <div style="clear: both"></div>
         </div>
     </div>
-    <footer>
-        <div class="inside">
-            <p lang="en"><a href="./imprint.html">Imprint</a></p>
-        </div>
-    </footer>
+<%- footer%>
 </div>
 
-
-<script src="./static/plugins/ep_user_pads/static/js/client/jquery.js" type="text/javascript"></script>
-<script src="./static/plugins/ep_user_pads/static/js/client/retina.js" type="text/javascript"></script>
-<script src="./static/plugins/ep_user_pads/static/js/client/etherpad.js" type="text/javascript"></script>
-
+<% e.begin_block("scripts"); %>
+<script src="/static/plugins/ep_user_pads/static/js/client/jquery.js" type="text/javascript"></script>
+<script src="/static/plugins/ep_user_pads/static/js/client/retina.js" type="text/javascript"></script>
+<script src="/static/plugins/ep_user_pads/static/js/client/etherpad.js" type="text/javascript"></script>
+<% e.end_block(); %>
 </body>
 </html>

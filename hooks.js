@@ -30,7 +30,8 @@ var authorManager = require('ep_etherpad-lite/node/db/AuthorManager');
 var sessionManager = require('ep_etherpad-lite/node/db/SessionManager');
 var crypto = require('crypto');
 var pkg = require('./package.json');
-var eMailAuth = require(__dirname + '/email.json');
+var eMailAuth = require(__dirname + '/settings.json').email;
+var confParams = require(__dirname + '/settings.json').params;
 var express = require('express');
 var formidable = require("formidable");
 
@@ -47,10 +48,16 @@ var node_mailer_transport = nodemailer.createTransport("sendmail");
  */
 var DEBUG_ENABLED = true;
 var USER_EXISTS = 'User already Exists';
-var PASSWORD_WRONG = 'Passwords do not agree';
+var PASSWORD_WRONG = 'Passwords do not match';
 var NO_VALID_MAIL = 'No valid E-Mail';
 var PW_EMPTY = 'Password is empty';
 
+var menuItems = [
+    { id: 'home', title: 'Home', location: 'home.html' },
+    { id: 'pads', title: 'Public Pads', location: 'pads.html' },
+    { id: 'groups', title: 'My Groups', location: 'groups.html' },
+    { id: 'help', title: 'Help', location: 'help.html' }
+];
 
 /*
  CONFIG
@@ -66,8 +73,6 @@ var dbAuthParams = {
 };
 var pool = mysql.createPool(dbAuthParams);
 
-
-// todo: remove ?
 settings.encryptPassword = function (password, salt, cb) {
     var encrypted = crypto.createHmac('sha256', salt).update(password).digest('hex');
     cb(encrypted);
@@ -594,6 +599,29 @@ var emailserver = email.server.connect({
     ssl: eMailAuth.ssl
 });
 
+/*
+ * GENERATORS 
+ */
+var getHeader = function (username, active) {
+    var args = {
+        menuitems: menuItems,
+        username: username,
+        active: active,
+        theme: confParams.theme
+    };
+    return eejs.require("ep_user_pads/templates/header_logged_in.ejs", args);
+};
+
+var getHeaderNotLogged = function () {
+    var args = {theme: confParams.theme};
+    return eejs.require("ep_user_pads/templates/header.ejs", args);
+};
+
+var getFooter = function () {
+    var args = {theme: confParams.theme};
+    return eejs.require("ep_user_pads/templates/footer.ejs", args);
+};
+
 exports.eejsBlock_adminMenu = function (hook_name, args, cb) {
     var hasAdminUrlPrefix = (args.content.indexOf('<a href="admin/') != -1),
         hasOneDirDown = (args.content.indexOf('<a href="../') != -1),
@@ -1028,153 +1056,134 @@ exports.expressCreateServer = function (hook_name, args, cb) {
     args.app.get('/index.html', function (req, res) {
         var authenticated = userAuthenticated(req);
         if (authenticated) {
-            res.redirect('home.html'); // ../home.html
-        } else {
-            var render_args = {
-                errors: [],
-                username: req.session.username
-            };
-            res.send(eejs
-                .require("ep_user_pads/templates/index.ejs",
-                    render_args));
+            res.redirect('home.html');
+            return;
         }
+
+        var render_args = {
+            errors: [],
+            username: req.session.username,
+            footer: getFooter(),
+            organization: confParams.organization
+        };
+
+        res.send(eejs.require("ep_user_pads/templates/index.ejs", render_args));
     });
 
     args.app.get('/help.html', function (req, res) {
         var authenticated = userAuthenticated(req);
-        if (authenticated) {
-            getUser(req.session.userId, function (found, currUser) {
-                var render_args;
-                if (currUser && currUser.length > 0) {
-                    render_args = {
-                        errors: [],
-                        username: currUser[0].FullName
-                    };
-                    res.send(eejs
-                        .require("ep_user_pads/templates/help.ejs",
-                            render_args));
-                } else {
-                    render_args = {
-                        errors: [],
-                        username: ""
-                    };
-                    res.send(eejs
-                        .require("ep_user_pads/templates/help.ejs",
-                            render_args));
-                }
-            });
-
-        } else {
+        if (!authenticated) {
             res.redirect("../index.html");
+            return;
         }
+        getUser(req.session.userId, function (found, currUser) {
+            var render_args = {
+                errors: [],
+                username: "",
+                footer: getFooter()
+            };
+            if (currUser && currUser.length > 0) {
+                render_args.username = currUser[0].FullName;
+            }
+            render_args.header = getHeader(render_args.username, 'help');
+            res.send(eejs.require("ep_user_pads/templates/help.ejs", render_args));
+        })
     });
 
     args.app.get('/home.html', function (req, res) {
         var authenticated = userAuthenticated(req);
-        if (authenticated) {
-            var sql = "Select g.* from Groups as g " +
-                "inner join UserGroup as ug on (ug.group_id = g.id) where ug.user_id = ?";
-            getAllSql(sql, [req.session.userId], function (groups) {
-                getUser(req.session.userId, function (found, currUser) {
-                    var render_args;
-                    if (currUser) {
-                        render_args = {
-                            errors: [],
-                            username: currUser[0].FullName,
-                            groups: groups
-                        };
-                        res.send(eejs
-                            .require("ep_user_pads/templates/home.ejs",
-                                render_args));
-                    } else {
-                        render_args = {
-                            errors: [],
-                            username: " ",
-                            groups: groups
-                        };
-                        res.send(eejs
-                            .require("ep_user_pads/templates/home.ejs",
-                                render_args));
-                    }
-                });
-            });
-        } else {
+        if (!authenticated) {
             res.redirect("../index.html");
+            return;
         }
+        var sql = "Select g.* from Groups as g " +
+            "inner join UserGroup as ug on (ug.group_id = g.id) where ug.user_id = ?";
+        getAllSql(sql, [req.session.userId], function (groups) {
+            getUser(req.session.userId, function (found, currUser) {
+                var render_args = {
+                    errors: [],
+                    username: "",
+                    footer: getFooter(),
+                    groups: groups
+                };
+                if (currUser) {
+                    render_args.username = currUser[0].FullName;
+                }
+                render_args.header = getHeader(render_args.username, 'home');
+                res.send(eejs.require("ep_user_pads/templates/home.ejs", render_args));
+            });
+        });
     });
 
 
     args.app.get('/pads.html', function (req, res) {
         var authenticated = userAuthenticated(req);
-        if (authenticated) {
-            getUser(req.session.userId, function (found, currUser) {
-                if (currUser) {
-                    var render_args = {
-                        errors: [],
-                        username: currUser[0].FullName
-                    };
-                    res.send(eejs
-                        .require("ep_user_pads/templates/pads.ejs",
-                            render_args));
-                }
-            });
-        } else {
+        if (!authenticated) {
             res.redirect("../index.html");
+            return;
         }
+        getUser(req.session.userId, function (found, currUser) {
+            var render_args = {
+                errors: [],
+                username: "",
+                footer: getFooter()
+            };
+            if (found && currUser) {
+                render_args.username = currUser[0].FullName;
+            }
+            render_args.header = getHeader(render_args.username, 'pads');
+            res.send(eejs.require("ep_user_pads/templates/pads.ejs", render_args));
+        });
     });
 
     args.app.get('/group.html/:groupid', function (req, res) {
-        log('debug', req.path);
         var authenticated = userAuthenticated(req);
-        log('debug', req.path + 'userAuthenticated CB');
-        if (authenticated) {
-            log('debug', req.path + 'Authenticated');
-            getPadsOfGroup(req.params.groupid, '', function (pads) {
-                log('debug', req.path + 'getPadsOfGroup CB');
-                getUser(req.session.userId, function (found, currUser) {
-                    log('debug', req.path + 'getUser CB');
-                    getGroup(req.params.groupid, function (found, currGroup) {
-                        log('debug', req.path + 'getGroup CB');
-                        getUserGroup(req.params.groupid, req.session.userId, function (found, currUserGroup) {
-                            log('debug', req.path + 'getUserGroup CB');
-                            var render_args;
-                            if (!currUserGroup) {
-                                render_args = {
-                                    errors: [],
-                                    msg: "This group does not exist! Perhaps someone has deleted the group."
-                                };
-                                res.send(eejs
-                                    .require("ep_user_pads/templates/msgtemplate.ejs",
-                                        render_args));
-                                return;
-                            }
-                            var isown = currUserGroup[0]['role_id'] == 1;
-                            if (currGroup && currUser && currUserGroup) {
-                                render_args = {
-                                    errors: [],
-                                    id: currGroup[0].name,
-                                    groupid: currGroup[0].id,
-                                    username: currUser[0].FullName,
-                                    isowner: isown,
-                                    pads: pads
-                                };
-                                res.send(eejs.require("ep_user_pads/templates/group.ejs", render_args));
-                            } else {
-                                render_args = {
-                                    errors: [],
-                                    msg: "This group does not exist. It might have been deleted."
-                                };
-                                res.send(eejs.require("ep_user_pads/templates/msgtemplate.ejs",
-                                    render_args));
-                            }
-                        });
+        if (!authenticated) {
+            res.redirect("../../index.html");
+            return;
+        }
+        log('debug', req.path + 'Authenticated');
+        getPadsOfGroup(req.params.groupid, '', function (pads) {
+            log('debug', req.path + 'getPadsOfGroup CB');
+            getUser(req.session.userId, function (found, currUser) {
+                log('debug', req.path + 'getUser CB');
+                getGroup(req.params.groupid, function (found, currGroup) {
+                    log('debug', req.path + 'getGroup CB');
+                    getUserGroup(req.params.groupid, req.session.userId, function (found, currUserGroup) {
+                        log('debug', req.path + 'getUserGroup CB');
+                        if (!currUserGroup) {
+                            var render_args = {
+                                errors: [],
+                                msg: "This group does not exist! Perhaps someone has deleted the group.",
+                                footer: getFooter()
+                            };
+                            res.send(eejs.require("ep_user_pads/templates/msgtemplate.ejs", render_args));
+                            return;
+                        }
+                        if (currGroup && currUser && currUserGroup) {
+                            render_args = {
+                                errors: [],
+                                id: currGroup[0].name,
+                                groupid: currGroup[0].id,
+                                username: currUser[0].FullName,
+                                isowner: currUserGroup[0]['role_id'] == 1,
+                                pads: pads,
+                                footer: getFooter(),
+                                header: getHeader(currUser[0].FullName, '')
+                            };
+                            res.send(eejs.require("ep_user_pads/templates/group.ejs", render_args));
+                            return;
+                        }
+                        render_args = {
+                            errors: [],
+                            msg: "This group does not exist. It might have been deleted.",
+                            footer: getFooter()
+                        };
+                        res.send(eejs.require("ep_user_pads/templates/msgtemplate.ejs", render_args));
                     });
                 });
-
             });
-        } else {
-            res.redirect("../../index.html");
-        }
+        });
     });
 
     args.app.get('/groups.html', function (req, res) {
@@ -1188,9 +1197,11 @@ exports.expressCreateServer = function (hook_name, args, cb) {
                     var render_args = {
                         errors: [],
                         username: currUser[0].FullName,
+                        footer: getFooter(),
                         groups: groups
                     };
 
+                    render_args.header = getHeader(render_args.username, 'groups');
                     res.send(eejs.require("ep_user_pads/templates/groups.ejs", render_args));
                 });
 
@@ -1661,54 +1672,59 @@ exports.expressCreateServer = function (hook_name, args, cb) {
                 var padsql = "select * from GroupPads as gp where gp.pad_name = ?";
                 existValueInDatabase(padsql, [padID], function (found) {
                     var render_args;
+
                     if (!found) {
                         render_args = {
                             errors: [],
-                            msg: "This pad does not exist! It might have been deleted."
+                            msg: "This pad does not exist! It might have been deleted.",
+                            footer: getFooter()
                         };
-                        res.send(eejs
-                            .require("ep_user_pads/templates/msgtemplate.ejs",
-                                render_args));
-                    } else {
-                        if (currGroup && currGroup.length > 0) {
-                            if (isAuthenticated) {
-                                if (currUser) {
-                                    render_args = {
-                                        errors: [],
-                                        padname: padID,
-                                        username: currUser[0].FullName,
-                                        groupid: req.params.group_id,
-                                        groupName: currGroup[0].name,
-                                        padurl: req.session.baseurl + "p/" + req.params.padID
-                                    };
-                                    res.send(eejs
-                                        .require("ep_user_pads/templates/pad.ejs",
-                                            render_args));
-                                } else
-                                    res.send("Error");
-                            } else {
-                                render_args = {
-                                    errors: [],
-                                    padname: req.params.padID,
-                                    username: req.session.username,
-                                    group_id: req.params.group_id,
-                                    groupName: currGroup[0].name,
-                                    padurl: req.session.baseurl + "p/" + req.params.padID
-                                };
-                                res.send(eejs
-                                    .require("ep_user_pads/templates/pad_with_login.ejs",
-                                        render_args));
-                            }
-                        } else {
-                            render_args = {
-                                errors: [],
-                                msg: "This group does not exist! It might have been deleted."
-                            };
-                            res.send(eejs
-                                .require("ep_user_pads/templates/msgtemplate.ejs",
-                                    render_args));
-                        }
+                        res.send(eejs.require("ep_user_pads/templates/msgtemplate.ejs", render_args));
+                        return;
                     }
+
+                    if (!(currGroup && currGroup.length > 0)) {
+                        render_args = {
+                            errors: [],
+                            msg: "This group does not exist! It might have been deleted.",
+                            footer: getFooter()
+                        };
+                        res.send(eejs.require("ep_user_pads/templates/msgtemplate.ejs", render_args));
+                        return;
+                    }
+
+                    if (!isAuthenticated) {
+                        render_args = {
+                            errors: [],
+                            padname: req.params.padID,
+                            username: req.session.username,
+                            group_id: req.params.group_id,
+                            groupName: currGroup[0].name,
+                            padurl: req.session.baseurl + "p/" + req.params.padID,
+                            header: getHeader(req.session.username, ''),
+                            footer: getFooter()
+                        };
+                        res.send(eejs.require("ep_user_pads/templates/pad_with_login.ejs", render_args));
+                        return;
+                    }
+
+                    if (!currUser) {
+                        res.send("Error");
+                        return;
+                    }
+
+                    // all checks DONE
+                    render_args = {
+                        errors: [],
+                        padname: padID,
+                        username: currUser[0].FullName,
+                        groupid: req.params.group_id,
+                        groupName: currGroup[0].name,
+                        padurl: req.session.baseurl + "p/" + req.params.padID,
+                        header: getHeader(currUser[0].FullName, ''),
+                        footer: getFooter()
+                    };
+                    res.send(eejs.require("ep_user_pads/templates/pad.ejs", render_args));
                 });
             });
         });
@@ -1724,25 +1740,27 @@ exports.expressCreateServer = function (hook_name, args, cb) {
     args.app.get('/public_pad/:id', function (req, res) {
         var authenticated = userAuthenticated(req);
         var render_args;
-        if (authenticated) {
+        if (!authenticated) {
             render_args = {
                 errors: [],
-                padurl: "p/" + req.params.id,
-                username: req.session.username,
-                padName: req.params.id
+                padurl: "/p/" + req.params.id,
+                header: getHeaderNotLogged(),
+                footer: getFooter()
             };
-            res.send(eejs
-                .require("ep_user_pads/templates/public_pad_logged_in.ejs",
-                    render_args));
-        } else {
-            render_args = {
-                errors: [],
-                padurl: "./../p/" + req.params.id
-            };
-            res.send(eejs
-                .require("ep_user_pads/templates/public_pad.ejs",
-                    render_args));
+            res.send(eejs.require("ep_user_pads/templates/public_pad.ejs", render_args));
+            return;
         }
+        getUser(req.session.userId, function (success, currUser) {
+            render_args = {
+                errors: [],
+                padurl: "/p/" + req.params.id,
+                username: currUser[0].FullName,
+                padName: req.params.id,
+                header: getHeader(currUser[0].FullName, ''),
+                footer: getFooter()
+            };
+            res.send(eejs.require("ep_user_pads/templates/public_pad_logged_in.ejs", render_args));
+        });
     });
 
     args.app.post('/login', function (req, res) {
@@ -1769,18 +1787,17 @@ exports.expressCreateServer = function (hook_name, args, cb) {
                     data.success = true;
                     res.send(data);
                     return true;
-                } else {
-                    if (!active) {
-                        sendError('User is inactive', res);
-                    }
-                    else if (!userFound || considered) {
-                        sendError('User or password wrong!', res);
-                    }
-                    else if (userFound && !considered) {
-                        sendError('You have to confirm your registration!', res);
-                    }
-                    return false;
                 }
+                if (!active) {
+                    sendError('User is inactive', res);
+                }
+                else if (!userFound || considered) {
+                    sendError('User or password wrong!', res);
+                }
+                else if (userFound && !considered) {
+                    sendError('You have to confirm your registration!', res);
+                }
+                return false;
             });
         });
     });
@@ -1821,31 +1838,28 @@ exports.expressCreateServer = function (hook_name, args, cb) {
             if (!found) {
                 render_args = {
                     errors: [],
-                    msg: "User not found!"
+                    msg: "User not found!",
+                    footer: getFooter()
                 };
-                res.send(eejs
-                    .require("ep_user_pads/templates/msgtemplate.ejs",
-                        render_args));
+                res.send(eejs.require("ep_user_pads/templates/msgtemplate.ejs", render_args));
             } else {
                 if (user[0]['considered']) {
                     render_args = {
                         errors: [],
-                        msg: 'User already confirmed!'
+                        msg: 'User already confirmed!',
+                        footer: getFooter()
                     };
-                    res.send(eejs
-                        .require("ep_user_pads/templates/msgtemplate.ejs",
-                            render_args));
+                    res.send(eejs.require("ep_user_pads/templates/msgtemplate.ejs", render_args));
                 } else {
                     var sql2 = "Update User SET considered = 1 WHERE id = ?";
                     updateSql(sql2, [user[0].user_id], function (success) {
                         if (success) {
                             var render_args = {
                                 errors: [],
-                                msg: 'Thanks for your registration!'
+                                msg: 'Thanks for your registration!',
+                                footer: getFooter()
                             };
-                            res.send(eejs
-                                .require("ep_user_pads/templates/msgtemplate.ejs",
-                                    render_args));
+                            res.send(eejs.require("ep_user_pads/templates/msgtemplate.ejs", render_args));
                         } else {
                             res.send('Something went wrong');
                         }
@@ -2073,8 +2087,7 @@ exports.expressCreateServer = function (hook_name, args, cb) {
 };
 
 exports.eejsBlock_indexWrapper = function (hook_name, args, cb) {
-    args.content = eejs
-        .require("ep_user_pads/templates/index_redirect.ejs");
+    args.content = eejs.require("ep_user_pads/templates/index_redirect.ejs");
     return cb();
 };
 

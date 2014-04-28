@@ -17,24 +17,22 @@ limitations under the License. -->
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title lang="en">Etherpad-Lite</title>
-    <link type="text/css"
-          href="./static/plugins/ep_user_pads/static/css/styles.css"
-          rel="stylesheet"/>
+    <link type="text/css" href="/static/plugins/ep_user_pads/static/css/styles.css" rel="stylesheet"/>
+    <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,700" rel="stylesheet" type="text/css">
 </head>
 <body>
 <div id="wrapper">
-    <header>
-    </header>
+    <header></header>
     <div id="main">
         <div id="title">
-            <span id="mainTitle" lang="en">Etherpad</span> <span id="altTitle"
-                                                                 lang="en"></span>
+            <span id="mainTitle" lang="en">Etherpad</span>
+            <span id="altTitle" lang="en">
+                <%= organization%>
+            </span>
         </div>
         <div class="inside">
             <div id="mainIllustration">
-                <img
-                        src="./static/plugins/ep_user_pads/static/images/pad-illustration-01.png"
-                        alt="Etherpad">
+                <img src="/static/plugins/ep_user_pads/static/images/pad-illustration-01.png" alt="Etherpad">
             </div>
             <div class="leftArea">
                 <h1 lang="en">Login for Private Group Pads</h1>
@@ -56,20 +54,12 @@ limitations under the License. -->
             <div style="clear: both"></div>
         </div>
     </div>
-    <footer>
-        <div class="inside">
-            <p lang="en"><a href="./../imprint.html">Imprint</a></p>
-        </div>
-    </footer>
+    <%- footer %>
 </div>
 
-<script
-        src="./static/plugins/ep_user_pads/static/js/client/jquery.js"
-        type="text/javascript"></script>
-<script
-        src="./static/plugins/ep_user_pads/static/js/client/retina.js"
-        type="text/javascript"></script>
-<script src="./static/plugins/ep_user_pads/static/js/client/login.js" type="text/javascript"></script>
+<script src="/static/plugins/ep_user_pads/static/js/client/jquery.js" type="text/javascript"></script>
+<script src="/static/plugins/ep_user_pads/static/js/client/retina.js" type="text/javascript"></script>
+<script src="/static/plugins/ep_user_pads/static/js/client/login.js" type="text/javascript"></script>
 
 </body>
 </html>

@@ -17,35 +17,12 @@ limitations under the License. -->
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title lang="en">Etherpad</title>
-    <link type="text/css" href="./../static/plugins/ep_user_pads/static/css/styles.css" rel="stylesheet"/>
+    <link type="text/css" href="/static/plugins/ep_user_pads/static/css/styles.css" rel="stylesheet"/>
     <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
 </head>
 <body>
 <div id="wrapper">
-    <header>
-        <div class="inside">
-            <nav id="mainMenu">
-                <ul>
-                    <li><a href="../home.html" lang="en">Home</a></li>
-                    <li class="separator">|</li>
-                    <li><a href="../pads.html" lang="en">Public Pads</a></li>
-                    <li class="separator">|</li>
-                    <li><a href="../groups.html" lang="en">My Groups</a></li>
-                    <li class="separator">|</li>
-                    <li><a href="../help.html" lang="en">Help</a></li>
-                </ul>
-            </nav>
-            <nav id="sekMenu">
-                <ul>
-                    <li><a lang="en" id="userProfile"><%= username %></a></li>
-                    <li class="separator">|</li>
-                    <li><a href="#" lang="en" id="logout">Logout</a></li>
-                </ul>
-            </nav>
-            <img src="./static/plugins/ep_user_pads/static/images/logo_tug_grey_white-01.png" alt="Etherpad"
-                 id="logo">
-        </div>
-    </header>
+    <%- header%>
     <div id="groupNav">
         <div class="inside">
             <nav>
@@ -61,7 +38,7 @@ limitations under the License. -->
     <div id="main">
         <div class="inside">
             <div class="headlineGroup">
-                <img src="./../static/plugins/ep_user_pads/static/images/users-cyan-64.png"
+                <img src="/static/plugins/ep_user_pads/static/images/users-cyan-64.png"
                      class="headlineGroupImage" alt="GruppeMID<%= id %>">
 
                 <h1 lang="en"><%= id %></h1>
@@ -69,7 +46,7 @@ limitations under the License. -->
             <div class="leftArea">
                 <div class="inputBlock marginTop">
                     <div class="headline">
-                        <img src="./../static/plugins/ep_user_pads/static/images/pad-32.png"
+                        <img src="/static/plugins/ep_user_pads/static/images/pad-32.png"
                              class="headlineImage" alt="Create Private Group Pad">
 
                         <h1 lang="en">Create Private Group Pad</h1>
@@ -86,7 +63,7 @@ limitations under the License. -->
 
                 <div class="inputBlock marginBottom">
                     <div class="headline">
-                        <img src="./../static/plugins/ep_user_pads/static/images/pad-32.png"
+                        <img src="/static/plugins/ep_user_pads/static/images/pad-32.png"
                              class="headlineImage" alt="Register">
 
                         <h1 lang="en">Manage Private Group Pads</h1>
@@ -108,7 +85,7 @@ limitations under the License. -->
                                 <% if (isowner) { %>
                                 <td title="Delete Pad" class="last">
                                     <img data-padname="<%= pads[i - 1].name %>" data-groupid="<%= groupid %>"
-                                         src="./../static/plugins/ep_user_pads/static/images/close-red-16.png"
+                                         src="/static/plugins/ep_user_pads/static/images/close-red-16.png"
                                          class="delete"></td>
                                 <% } %>
                             </tr>
@@ -122,7 +99,7 @@ limitations under the License. -->
                                 <td title="Delete Pad" class="last">
                                     img data-padname="<%= pads[i - 1].name %>"
                                     data-groupid="<%= groupid %>"
-                                    src="./../static/plugins/ep_user_pads/static/images/close-red-16.png"
+                                    src="/static/plugins/ep_user_pads/static/images/close-red-16.png"
                                     class="delete">
                                 </td>
                                 <% } %>
@@ -140,23 +117,19 @@ limitations under the License. -->
                 </div>
             </div>
             <div class="rightArea">
-                <img src="./../static/plugins/ep_user_pads/static/images/pad-illustration-private.png"
+                <img src="/static/plugins/ep_user_pads/static/images/pad-illustration-private.png"
                      alt="Public Pads" class="padIllustration">
             </div>
             <div style="clear: both"></div>
         </div>
     </div>
-    <footer>
-        <div class="inside">
-            <p lang="en"><a href="./../imprint.html">Imprint</a></p>
-        </div>
-    </footer>
+<%- footer%>
 </div>
-<script src="./../static/plugins/ep_user_pads/static/js/client/jquery.js" type="text/javascript"></script>
-<script src="./../static/plugins/ep_user_pads/static/js/client/documentReadyRefresh.js"
+<script src="/static/plugins/ep_user_pads/static/js/client/jquery.js" type="text/javascript"></script>
+<script src="/static/plugins/ep_user_pads/static/js/client/documentReadyRefresh.js"
         type="text/javascript"></script>
-<script src="./../static/plugins/ep_user_pads/static/js/client/retina.js" type="text/javascript"></script>
-<script src="./../static/plugins/ep_user_pads/static/js/client/etherpad.js" type="text/javascript"></script>
+<script src="/static/plugins/ep_user_pads/static/js/client/retina.js" type="text/javascript"></script>
+<script src="/static/plugins/ep_user_pads/static/js/client/etherpad.js" type="text/javascript"></script>
 <script>
     var getBaseURL = function (slice, cb) {
         var loc = document.location,
@@ -170,9 +143,9 @@ limitations under the License. -->
         $(".delete").click(function () {
             $("#wrapper").append('<div id="overlay"></div>');
             $("#wrapper").append('<div id="lightBox"><div id="lightBoxHeader"' +
-                    '><span class="close"><img src="./../static/plugins/ep_user_pads/static/images/close-cyan-12.png"' +
+                    '><span class="close"><img src="/static/plugins/ep_user_pads/static/images/close-cyan-12.png"' +
                     '></span></div><div id="lightBoxMain">' +
-                    '<div class="headline"><img src="./../static/plugins/ep_user_' +
+                    '<div class="headline"><img src="/static/plugins/ep_user_' +
                     'pad_frontend/static/images/close-red-32.png" class="headlineImage"' +
                     'alt="Delete"><h1 lang="en" class="red">Delete "' + $(this).data('padname') + '"' +
                     '</h1></div><div class="content"><button lang="en" class="marginRight" id="deletePadButton"' +

@@ -4,7 +4,7 @@
 *.patch
 *~
 .ep_initialized
-email.json
-!email.json.template
+settings.json
+!settings.json.template
 node_modules
 npm-debug.log
