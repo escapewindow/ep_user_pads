@@ -28,11 +28,20 @@ There has been a database transformation which includes:
 
 All database changes are possible on a existing installation and can be automated using the provided [modify_tables.sql](sql/modify_tables.sql) file. Please be aware that all rows violating foreign constraints will be deleted. In our migration of a 4GB database, ZERO rows were deleted.
 
-## email.json
+## settings.json(.template)
 
 This file contains all the settings for this plugin. See the table below for the explanation of every setting.
 
-| Name | Value | explanation |
+### Params
+
+| Name | Type | explanation |
+| :------------ | :---------------: | :----- |
+| theme | string | Name of your theme directory |
+| organization | string | Name of your organization (displayed on startpage |
+
+### Email
+
+| Name | Type | explanation |
 | :------------ | :---------------: | :----- |
 | smtp | boolean | Is the setting ’true’, the plugin uses a smtp - server to sent the messages Is this Value false the mail will be send over the server on port 25. The settings ’user’ to ’ssl’ are not necessary if this setting is false. |
 | user | string | Name of the smtp-user. |
