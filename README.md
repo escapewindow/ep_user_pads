@@ -13,8 +13,8 @@ If you do that, you can follow this procedure after that:
 
 1. `cd ep_user_pads`
 2. `npm install`
-3. rename email.json.template to email.json
-4. enter correct data in email.json (see email.json section)
+3. copy settings.json.template to settings.json
+4. enter correct data in settings.json (see email.json section)
 5. restart etherpad
 
 Don't forget to create the database tables (with [create_tables.sql](sql/create_tables.sql)) at some point if not already present or migrate from previous versions (with [modify_tables.sql](sql/modify_tables.sql)).
@@ -37,7 +37,7 @@ This file contains all the settings for this plugin. See the table below for the
 | Name | Type | explanation |
 | :------------ | :---------------: | :----- |
 | theme | string | Name of your theme directory |
-| organization | string | Name of your organization (displayed on startpage |
+| organization | string | Name of your organization (displayed on startpage) |
 
 ### Email
 
