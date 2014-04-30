@@ -18,31 +18,8 @@ limitations under the License. -->
     <meta name="viewport"
           content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
     <link rel="stylesheet" href="/static/css/admin.css">
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="/static/js/jquery.js"></script>
-    <script type="text/javascript" src="/static/js/require-kernel.js"></script>
-    <script type="text/javascript"
-            src="../../../javascripts/lib/ep_etherpad-lite/static/js/ace2_common.js?callback=require.define"></script>
-    <script type="text/javascript">
-        (function () {
-            var pathComponents = location.pathname.split('/');
-            var baseURL = pathComponents.slice(0, pathComponents.length - 4).join('/')+ '/';
-            require.setRootURI(baseURL + "javascripts/src");
-            require.setLibraryURI(baseURL + "javascripts/lib");
-            require.setGlobalKeyPath("require");
-            var plugins = require('ep_etherpad-lite/static/js/pluginfw/client_plugins');
-            var hooks = require('ep_etherpad-lite/static/js/pluginfw/hooks');
-            plugins.baseURL = baseURL;
-            plugins.update(function () {
-                hooks.plugins = plugins;
-                hooks.aCallAll('documentReady', 'admin/user_pad_group');
-            });
-        }());
-    </script>
     <link rel="stylesheet" href="/static/plugins/ep_user_pads/static/css/useradmin-group.css" type="text/css"/>
-    <% e.begin_block("styles"); %>
-
-    <% e.end_block(); %>
+    <% e.begin_block("styles"); %> <% e.end_block(); %>
 </head>
 <body>
 <div id="wrapper">
@@ -152,6 +129,28 @@ limitations under the License. -->
         </div>
     </div>
 </div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/static/js/jquery.js"></script>
+<script type="text/javascript" src="/static/js/require-kernel.js"></script>
+<script type="text/javascript"
+        src="../../../javascripts/lib/ep_etherpad-lite/static/js/ace2_common.js?callback=require.define"></script>
+<script type="text/javascript">
+    (function () {
+        var pathComponents = location.pathname.split('/');
+        var baseURL = pathComponents.slice(0, pathComponents.length - 4).join('/')+ '/';
+        require.setRootURI(baseURL + "javascripts/src");
+        require.setLibraryURI(baseURL + "javascripts/lib");
+        require.setGlobalKeyPath("require");
+        var plugins = require('ep_etherpad-lite/static/js/pluginfw/client_plugins');
+        var hooks = require('ep_etherpad-lite/static/js/pluginfw/hooks');
+        plugins.baseURL = baseURL;
+        plugins.update(function () {
+            hooks.plugins = plugins;
+            hooks.aCallAll('documentReady', 'admin/user_pad_group');
+        });
+    }());
+</script>
 </body>
 
 </html>
