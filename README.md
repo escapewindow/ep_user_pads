@@ -13,8 +13,8 @@ If you do that, you can follow this procedure after that:
 
 1. `cd ep_user_pads`
 2. `npm install`
-3. rename email.json.template to email.json
-4. enter correct data in email.json (see email.json section)
+3. copy settings.json.template to settings.json
+4. enter correct data in settings.json (see email.json section)
 5. restart etherpad
 
 Don't forget to create the database tables (with [create_tables.sql](sql/create_tables.sql)) at some point if not already present or migrate from previous versions (with [modify_tables.sql](sql/modify_tables.sql)).
@@ -28,11 +28,20 @@ There has been a database transformation which includes:
 
 All database changes are possible on a existing installation and can be automated using the provided [modify_tables.sql](sql/modify_tables.sql) file. Please be aware that all rows violating foreign constraints will be deleted. In our migration of a 4GB database, ZERO rows were deleted.
 
-## email.json
+## settings.json(.template)
 
 This file contains all the settings for this plugin. See the table below for the explanation of every setting.
 
-| Name | Value | explanation |
+### Params
+
+| Name | Type | explanation |
+| :------------ | :---------------: | :----- |
+| theme | string | Name of your theme directory |
+| organization | string | Name of your organization (displayed on startpage) |
+
+### Email
+
+| Name | Type | explanation |
 | :------------ | :---------------: | :----- |
 | smtp | boolean | Is the setting ’true’, the plugin uses a smtp - server to sent the messages Is this Value false the mail will be send over the server on port 25. The settings ’user’ to ’ssl’ are not necessary if this setting is false. |
 | user | string | Name of the smtp-user. |
