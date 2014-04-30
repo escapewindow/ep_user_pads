@@ -3,6 +3,11 @@
         "theme": "default",
         "organization": "United Etherpads of the World"
     },
+    "notification": { 
+        "enabled": false,
+        "text": "MyMessage",
+        "type": "warn"
+    },
     "email": {
         "smtp": "false",
         "user": "mustermann@example.com",

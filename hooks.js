@@ -32,6 +32,7 @@ var crypto = require('crypto');
 var pkg = require('./package.json');
 var eMailAuth = require(__dirname + '/settings.json').email;
 var confParams = require(__dirname + '/settings.json').params;
+var confNotify = require(__dirname + '/settings.json').notification;
 var express = require('express');
 var formidable = require("formidable");
 
@@ -618,7 +619,7 @@ var getHeaderNotLogged = function () {
 };
 
 var getFooter = function () {
-    var args = {theme: confParams.theme};
+    var args = {theme: confParams.theme, notification: JSON.stringify(confNotify)};
     return eejs.require("ep_user_pads/templates/footer.ejs", args);
 };
 
