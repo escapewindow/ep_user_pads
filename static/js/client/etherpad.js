@@ -299,7 +299,7 @@ $(document).ready(function () {
                     value += '</tr>';
                 }
             }
-            value += '</table></div><div class="navigationInfo"><span id="previousPageU"><<</span> <span id="currentPageU"></span> to <span id="currentPageCountU"></span> of <span id="pageCountU"></span> Users <span id="nextPageU">>></span></div>';
+            value += '</table></div><div class="navigationInfo"><span id="previousPageU" class="pointer"><<</span> <span id="currentPageU"></span> to <span id="currentPageCountU"></span> of <span id="pageCountU"></span> Users <span id="nextPageU" class="pointer">>></span></div>';
         }
         value += '</div></div></div>';
         cb(value);
@@ -543,21 +543,6 @@ $(document).ready(function () {
             }
 
             initPaging(6);
-            /*e.preventDefault();
-             //		console.log('enter');
-             var data = {};
-
-             var url;
-             getBaseURL(1,function(baseurl){
-             url = baseurl;
-             data.searchterm= $('#search').val();
-             data.location = url;
-             post(data, url+'groupsSearchTerm' ,function(data){
-             $('#table').html(data);
-             $(document).ready();
-             });
-             });*/
-
         });
 
         /*
@@ -624,10 +609,11 @@ $(document).ready(function () {
         /*
          * Initalize the Paging
          */
+        var page = 0;
         function initPaging(rowsize) {
             // initalize the paging view
             //console.log(rowsize);
-            var page = 0;
+            page = 0;
             $("#nextPageU").hide();
             $("#previousPageU").hide();
 
