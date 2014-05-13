@@ -1030,7 +1030,6 @@ $(document).ready(function () {
                     $("#createPrivatePadForm input").each(function () {
                         if ($(this).next().hasClass("errorUp"))
                             $(this).next().remove();
-                        //if($(this).is('#createPrivateGroup') && !$(this).next().hasClass("errorUp") && data.error == 'Group already exists');
                         $(this).parent().append('<div class="errorUp"><span class="arrowUp"></span><span lang="en">' + data.error + '</span></div>');
                         $("#createPrivatePadForm .errorUp").delay(2000).fadeOut(1000);
                     });
@@ -1044,21 +1043,15 @@ $(document).ready(function () {
 
     $('.padClick').click(function (e) {
         e.preventDefault();
-//		console.log('here we are');
         var groupId = $(this).data('groupid');
-//		console.log(groupId);
         var padname = $(this).data('name');
-//		console.log(padname);
         var data = {};
         var url;
         getBaseURL(2, function (baseurl) {
-//			console.log('adfklöajk');
             url = baseurl;
-//			console.log(url);
             data.location = url;
             data.groupId = groupId;
             data.padname = padname;
-//			console.log(data);
             post(data, url + 'directToPad', function (data) {
                 document.cookie = "sessionID=" + data.session + "; path=/";
                 window.location = window.location + "/pad.html/" + data.group + "$" + data.pad_name;
@@ -1066,7 +1059,7 @@ $(document).ready(function () {
         });
     });
 
-    $("#register").click(function () {
+    /*$("#register").click(function () {
         $("#wrapper").append('<div id="overlay"></div>');
         $("#wrapper").append('<div id="lightBox"><div id="lightBoxHeader"><span class="close"><img src="../../static/plugins/ep_user_pads/static/images/close-cyan-12.png"></span></div><div id="lightBoxMain"><div class="headline"><img src="./../../static/plugins/ep_user_pads/static/images/user-32.png" class="headlineImage" alt="Register"><h1>Register</h1></div><div class="content">\
    							  <form id="formEtherpadRegister">\
@@ -1126,9 +1119,9 @@ $(document).ready(function () {
                     }
                 });
             });
-        });
+        })
 
-    });
+    });*/
 
 
 });

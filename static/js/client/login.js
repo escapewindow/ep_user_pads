@@ -38,7 +38,7 @@ $(document).ready(function () {
     							  <form id="formEtherpadLogin">\
     	  					 	  <div class="inputField"><input type="text" name="email" id="email" placeholder="E-Mailaddress" class="smallMarginBottom"></div>\
     					 	 	  <div class="inputField"><input type="password" name="password" id="password" placeholder="Password" class="smallMarginBottom"></div>\
-    							  <button type="submit" id="overlayLogin" lang="en">Login</button>\
+    							  <button type="submit" id="overlayLogin" lang="en">Submit</button>\
     							  </form></div></div></div>');
         $("#lightBox").css("margin-top", -$("#lightBox").height() / 2);
 
