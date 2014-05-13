@@ -1036,10 +1036,10 @@ exports.expressCreateServer = function (hook_name, args, cb) {
      ADMIN PART
      */
     args.app.get('/admin/userpadadmin', function (req, res) {
-        var sql = "(select 'users', count(*) as count from user)" 
-            + "union (select 'groups', count(*) from groups)" 
-            + "union (select 'grouppads', count(*) from grouppads)" 
-            + "union (select 'invites', count(*) from notregisteredusersgroups);";
+        var sql = "(select 'users', count(*) as count from User)" 
+            + "union (select 'groups', count(*) from Groups)" 
+            + "union (select 'grouppads', count(*) from GroupPads)" 
+            + "union (select 'invites', count(*) from NotRegisteredUsersGroups);";
         var render_args = { users: 0, groups: 0, grouppads: 0, invites: 0, errors: []};
         
         pool.query(sql, function(err, reslt) {
