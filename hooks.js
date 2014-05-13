@@ -210,7 +210,9 @@ var userAuthentication = function (username, password, cb) {
         }
 
         encryptPassword(password, foundUser['salt'], function (encrypted) {
-            if (foundUser['pwd'] == encrypted && foundUser['considered'] && foundUser['active']) {
+            // note: allows login with password or with full pwd hash, to allow direct login after confirmation
+            if ((foundUser['pwd'] == encrypted || foundUser['pwd'] == password) 
+                && foundUser['considered'] && foundUser['active']) {
                 // password correct
                 cb(true, foundUser, true, foundUser['considered'], foundUser['active']);
             } else {
@@ -1031,6 +1033,20 @@ exports.socketio = function (hook_name, args, cb) {
 // todo: merge
 
 
+var loginUser = function (req, user) {
+    req.session.email = user.name;
+    req.session.password = user.pwd;
+    req.session.userId = user.id;
+    req.session.username = user.FullName;
+    return req;
+};
+function logoutUser(req) {
+    req.session.email = null;
+    req.session.password = null;
+    req.session.userId = null;
+    req.session.username = null;
+    return req;
+}
 exports.expressCreateServer = function (hook_name, args, cb) {
     /*
      ADMIN PART
@@ -1631,10 +1647,7 @@ exports.expressCreateServer = function (hook_name, args, cb) {
             var deleteSqlUser = "Delete from User where id = ?";
             updateSql(deleteSqlUser, [req.session.userId], function (success2) {
                 if (success2) {
-                    req.session.email = null;
-                    req.session.password = null;
-                    req.session.userId = null;
-                    req.session.username = null;
+                    req = logoutUser(req);
                 }
                 res.send({success: success2});
             });
@@ -1854,7 +1867,7 @@ exports.expressCreateServer = function (hook_name, args, cb) {
 
     args.app.get('/confirm/:consString', function (req, res) {
         var sql = "Select * from User as u where u.considerationString = ?";
-        getOneValueSql(sql, [req.params['consString']], function (found, user) {
+        getOneValueSql(sql, [req.params['consString']], function (found, users) {
             var render_args;
             if (!found) {
                 render_args = {
@@ -1864,7 +1877,7 @@ exports.expressCreateServer = function (hook_name, args, cb) {
                 };
                 res.send(eejs.require("ep_user_pads/templates/msgtemplate.ejs", render_args));
             } else {
-                if (user[0]['considered']) {
+                if (users[0]['considered']) {
                     render_args = {
                         errors: [],
                         msg: 'User already confirmed!',
@@ -1873,8 +1886,10 @@ exports.expressCreateServer = function (hook_name, args, cb) {
                     res.send(eejs.require("ep_user_pads/templates/msgtemplate.ejs", render_args));
                 } else {
                     var sql2 = "Update User SET considered = 1 WHERE id = ?";
-                    updateSql(sql2, [user[0].user_id], function (success) {
+                    updateSql(sql2, [users[0].id], function (success) {
                         if (success) {
+                            // login
+                            req = loginUser(req, users[0]);
                             var render_args = {
                                 errors: [],
                                 msg: 'Thanks for your registration!',
