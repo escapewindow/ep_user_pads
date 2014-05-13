@@ -46,6 +46,35 @@ limitations under the License. -->
             </ul>
         </div>
         <% e.end_block(); %>
+
+        <table class="dbTable">
+            <thead>
+            <tr>
+                <th>Entity</th>
+                <th>Count</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>Users</td>
+                <td><%= users %></td>
+            </tr>
+            <tr>
+                <td>Groups</td>
+                <td><%= groups %></td>
+            </tr>
+
+            <tr>
+                <td>Group Pads</td>
+                <td><%= grouppads %></td>
+            </tr>
+
+            <tr>
+                <td>Pending Invites</td>
+                <td><%= invites %></td>
+            </tr>
+            </tbody>
+        </table>
     </div>
 </div>
 

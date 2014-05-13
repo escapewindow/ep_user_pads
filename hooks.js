@@ -1036,7 +1036,24 @@ exports.expressCreateServer = function (hook_name, args, cb) {
      ADMIN PART
      */
     args.app.get('/admin/userpadadmin', function (req, res) {
-        res.send(eejs.require("ep_user_pads/templates/admin/user_pad_admin.ejs", {errors: []}));
+        var sql = "(select 'users', count(*) as count from user)" 
+            + "union (select 'groups', count(*) from groups)" 
+            + "union (select 'grouppads', count(*) from grouppads)" 
+            + "union (select 'invites', count(*) from notregisteredusersgroups);";
+        var render_args = { users: 0, groups: 0, grouppads: 0, invites: 0, errors: []};
+        
+        pool.query(sql, function(err, reslt) {
+            if (err) {
+                mySqlErrorHandler(err);
+            } else {
+                render_args.users = reslt[0]['count'];
+                render_args.groups = reslt[1]['count'];
+                render_args.grouppads = reslt[2]['count'];
+                render_args.invites = reslt[3]['count'];
+            }
+            log('debug', render_args);
+            res.send(eejs.require("ep_user_pads/templates/admin/user_pad_admin.ejs", render_args));
+        });
     });
     args.app.get('/admin/userpadadmin/groups', function (req, res) {
         res.send(eejs.require("ep_user_pads/templates/admin/user_pad_admin_groups.ejs", {errors: []}));
