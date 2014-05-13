@@ -1036,13 +1036,13 @@ exports.expressCreateServer = function (hook_name, args, cb) {
      ADMIN PART
      */
     args.app.get('/admin/userpadadmin', function (req, res) {
-        var sql = "(select 'users', count(*) as count from User)" 
-            + "union (select 'groups', count(*) from Groups)" 
-            + "union (select 'grouppads', count(*) from GroupPads)" 
+        var sql = "(select 'users', count(*) as count from User)"
+            + "union (select 'groups', count(*) from Groups)"
+            + "union (select 'grouppads', count(*) from GroupPads)"
             + "union (select 'invites', count(*) from NotRegisteredUsersGroups);";
         var render_args = { users: 0, groups: 0, grouppads: 0, invites: 0, errors: []};
-        
-        pool.query(sql, function(err, reslt) {
+
+        pool.query(sql, function (err, reslt) {
             if (err) {
                 mySqlErrorHandler(err);
             } else {
@@ -1316,14 +1316,16 @@ exports.expressCreateServer = function (hook_name, args, cb) {
             var sqlRg = "REPLACE INTO UserGroup Values(?, ?, 2)";
             var sqlNrg = "REPLACE INTO NotRegisteredUsersGroups Values(?, ?)";
             var sql = isRegistered ? sqlRg : sqlNrg;
+            var firstParam = isRegistered? users[0].id : eMail;
 
-            pool.query(sql, [eMail, group_id], function (err) {
+            pool.query(sql, [firstParam, group_id], function (err) {
                 if (err) mySqlErrorHandler(err);
             });
         });
     }
 
     args.app.post('/inviteUsers', function (req, res) {
+        log('debug', '/inviteUsers');
         new formidable.IncomingForm().parse(req, function (err, fields) {
             var authenticated = userAuthenticated(req);
             if (!authenticated) {
@@ -1362,6 +1364,7 @@ exports.expressCreateServer = function (hook_name, args, cb) {
                     var group = groups[0];
 
                     getUser(req.session.userId, function (found, currUser) {
+                        log('debug', fields);
                         for (var i = 0; i < fields.users.length; i++) {
                             if (fields.users[i] != "") {
                                 var userEmail = fields.users[i].toString().replace(/\s/g, '');
