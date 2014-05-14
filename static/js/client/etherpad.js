@@ -1,4 +1,4 @@
-/* Copyright 2014 Alexander Oberegger
+/* Copyright 2014 Alexander Oberegger, Igor Skoric
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -1054,72 +1054,6 @@ $(document).ready(function () {
             });
         });
     });
-
-    /*$("#register").click(function () {
-     $("#wrapper").append('<div id="overlay"></div>');
-     $("#wrapper").append('<div id="lightBox"><div id="lightBoxHeader"><span class="close"><img src="../../static/plugins/ep_user_pads/static/images/close-cyan-12.png"></span></div><div id="lightBoxMain"><div class="headline"><img src="./../../static/plugins/ep_user_pads/static/images/user-32.png" class="headlineImage" alt="Register"><h1>Register</h1></div><div class="content">\
-     <form id="formEtherpadRegister">\
-     <label for="fullname">Full Name</label><div class="inputfield marginBottom"><input type="text" name="fullname" id="fullname" class="smallMarginBottom"></div>\
-     <label for="email">E-Mailaddress</label><div class="inputfield marginBottom"><input type="text" name="email" id="email" class="smallMarginBottom"></div>\
-     <label for="password">Password</label><div class="inputfield"><input type="password" name="password" id="password" placeholder="Password" class="smallMarginBottom"></div><div class="inputfield marginBottom"><input type="password" name="passwordrepeat" id="passwordrepeat" placeholder="Repeat Password" class="smallMarginBottom"></div>\
-     <button type="submit" class="register" id="overlayRegister">Register</button>\
-     </form></div></div></div>');
-     $("#lightBox").css("margin-top", -$("#lightBox").height() / 2);
-
-     // click-event for the closing of the lightBox
-     $(".close").click(function () {
-     $("#overlay").remove();
-     $("#lightBox").remove();
-     });
-
-     // validation of the login
-     // TODO: correct reaction on the validation
-     $("#formEtherpadRegister").submit(function (e) {
-     e.preventDefault();
-     getBaseURL(null, function (baseurl) {
-     var data = {};
-     data.email = $("#email").val();
-     data.password = $("#password").val();
-     data['FullName'] = $("#fullname").val();
-     data.passwordrepeat = $("#passwordrepeat").val();
-
-     data.location = baseurl;
-     $.ajax({
-     type: 'POST',
-     data: JSON.stringify(data),
-     contentType: 'application/json',
-     url: baseurl + 'register',
-     success: function (data) {
-     if (data.success)
-     window.location = "index.html";
-     else {
-     console.log(data.error);
-     $("#formEtherpadRegister input").each(function () {
-     if ($(this).next().hasClass("errorRight"))
-     $(this).next().remove();
-     if ($(this).is('#email') && !$(this).next().hasClass("errorRight") && (data.error == 'User already Exists' || data.error == 'No valid E-Mail')) {
-     $(this).parent().append('<div class="errorRight"><span class="arrowRight"></span>><span lang="en">' + data.error + '</span></div>');
-     $(".errorRight").delay(2000).fadeOut(1000);
-     }
-     if ($(this).is('#password') && !$(this).next().hasClass("errorRight") && data.error == 'Passwords do not agree') {
-     $(this).parent().append('<div class="errorRight"><span class="arrowRight"></span><span lang="en">' + data.error + '</span></div>');
-     $(".errorRight").delay(2000).fadeOut(1000);
-     }
-
-     });
-     //						console.log(data);
-     }
-     },
-     error: function (xhr, ajaxOptions, thrownError) {
-     console.log(thrownError);
-     }
-     });
-     });
-     })
-
-     });*/
-
-
 });
 
 
