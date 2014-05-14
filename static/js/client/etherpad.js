@@ -223,7 +223,7 @@ $(document).ready(function () {
     /*
      * User Profile
      */
-    
+
     // when the user name is clicked, the lightbox with the profile data appears
     $("#userProfile").click(function () {
         getSlice(function (slice) {
@@ -233,73 +233,72 @@ $(document).ready(function () {
         });
     });
 
-    
+
     /*
      * Groups
      * 
      */
 
     function createUserManagement(users, selectedUserVal, groupID, cb) {
-        var value = "";
-        value += '<div id="lightBox"><div id="lightBoxHeader"><span class="close"><img src="./static/plugins/ep_user_pads/static/images/close-cyan-12.png"' +
-            '></span></div><div id="lightBoxMain" data-groupid= "' + groupID + '" ><div class="headline"><img src="./static/plugins/ep_user_pads/static/images/user-32.png" class="' +
-            'headlineImage" alt="Login"><h1 lang="en">User Management</h1></div><div class="content"><h3 lang="en">Add User</h3><div id= "wait"><form id = "selUsersForm"><input type="text"' +
-            'lang="en" placeholder="E-Mailaddress(es)" ';
-        if (!(selectedUserVal == ""))
-            value += 'value="' + selectedUserVal + '"';
-        value += 'id="selectedUsers" class="marginRight" longInput><button id="invitebtn" type="submit">Add User</button><span lang="en" class="inviteInfo"' +
-            '>If there are more than one, separate with ;</span></form></div><h3 lang="en">Manage User</h3>';
+        var startVars = {
+            selUsersValAttrib: (selectedUserVal == "") ? '' : 'value="' + selectedUserVal + '" ',
+            groupID: groupID
+        };
+        var startValue = '<div id="lightBox"><div id="lightBoxHeader"><span class="close">' +
+            '<img src="./static/plugins/ep_user_pads/static/images/close-cyan-12.png"></span></div>' +
+            '<div id="lightBoxMain" data-groupid= "%{groupID}" ><div class="headline">' +
+            '<img src="./static/plugins/ep_user_pads/static/images/user-32.png" class="headlineImage" alt="Login">' +
+            '<h1 lang="en">User Management</h1></div>' +
+            '<div class="content"><h3 lang="en">Add User</h3><div id= "wait">' +
+            '<form id = "selUsersForm">' +
+            '<input type="text" lang="en" placeholder="E-Mailaddress(es)" {selUsersValAttrib} id="selectedUsers" class="marginRight" longInput>' +
+            '<button id="invitebtn" type="submit">Add User</button>' +
+            '<span lang="en" class="inviteInfo">If there are more than one, separate with ;</span></form></div>' +
+            '<h3 lang="en">Manage Members</h3>';
+        var value = Kiwi.compose(startValue, startVars);
+
         if (users.length == 0) {
             value += '<h4 class="red" lang="en">No user in this group.</h4>';
         } else {
-            value += '<form style="margin-bottom:5px"><input type="text" id="searchU" placeholder="Search"></form><div class="tableview" style="height: 157px; overflow: hidden"><table>';
+            value += '<form style="margin-bottom:5px">' +
+                '<input type="text" id="searchU" placeholder="Search"></form>' +
+                '<div class="tableview" style="height: 157px; overflow: hidden"><table>';
 
             for (var i = 0; i < users.length; i++) {
-                if (!(i % 2 == 1)) {
-                    if (users[i].notRegistered) {
-                        value += '<tr id="User' + users[i].userID + '" class="grey visible">\
-							<td class="first"><span id="userEmail" data-toinvite="1" data-mail="' + users[i].name + '" data-userid="' + users[i].userID + '">' + users[i].name + ' <span class="smallFont"> (Invited)</span></span></td>\
-							<td class="last right" id="options"  data-groupid="' + groupID + '"><img src="./static/plugins/ep_user_pads/static/images/options-16.png" class="options" data-groupid="' + groupID + '" data-userid="' + users[i].userID + '"></td>\
-						</tr>';
-                    }
-                    else if (users[i]['role_id'] == 1) {
-                        value += '<tr class="odd visible" id="User' + users[i].userID + '" >' +
-                            '<td class = "first"><span id="userEmail"  data-mail="' + users[i].name + '" data-userid="' + users[i].userID + '" >' + users[i]['FullName'] + ' <span class="smallFont">(Owner)</span></span></td>' +
-                            '<td class="last right" id="options"  data-groupid="' + groupID + '"><img src="./static/plugins/ep_user_pads/static/images/options-16.png" class = "options" data-groupid="' + groupID + '" data-userid="' + users[i].userID + '"> </td>';
-                    } else if (users[i]['invited']) {
-                        value += '<tr  class="grey visible" id="User' + users[i].userID + '">' +
-                            '<td class="first"><span id="userEmail" data-mail="' + users[i].name + '" data-userid="' + users[i].userID + '" >' + users[i].name + ' <span class="smallFont"> (Invited)</span></span></td>' +
-                            '<td class="last right" id="options"  data-groupid="' + groupID + '"><img src="./static/plugins/ep_user_pads/static/images/options-16.png" class = "options" data-groupid="' + groupID + '" data-userid="' + users[i].userID + '"> </td>';
-                    } else {
-                        value += '<tr  class="odd visible" id="User' + users[i].userID + '">' +
-                            '<td class = "first"><span id="userEmail" data-mail="' + users[i].name + '" data-userid="' + users[i].userID + '" >' + users[i]['FullName'] + '</span></td>' +
-                            '<td class="last right" id="options"  data-groupid="' + groupID + '"><img src="./static/plugins/ep_user_pads/static/images/options-16.png" data-groupid="' + groupID + '" class = "options" data-userid="' + users[i].userID + '" ></td>';
-                    }
-                    value += '</tr>';
-                } else {
-                    if (users[i].notRegistered) {
-                        value += '<tr id="User' + users[i].userID + '" class="grey visible" >\
-							<td class="first"><span id="userEmail" data-toinvite="1" data-mail="' + users[i].name + '" data-userid="' + users[i].userID + '">' + users[i].name + '<span class="smallFont"> (Invited)</span></span></td>\
-							<td class="last right" id="options"  data-groupid="' + groupID + '"><img src="./static/plugins/ep_user_pads/static/images/options-16.png" class="options" data-groupid="' + groupID + '" data-userid="' + users[i].userID + '"></td>\
-						</tr>';
-                    }
-                    else if (users[i]['role_id'] == 1) {
-                        value += '<tr  class="visible" id="User' + users[i].userID + '">' +
-                            '<td class = "first"><span id="userEmail" data-mail="' + users[i].name + '" data-userid="' + users[i].userID + '" >' + users[i]['FullName'] + ' <span class="smallFont">(Owner)</span></span></td>' +
-                            '<td class="last right" id="options" data-groupid="' + groupID + '"><img src="./static/plugins/ep_user_pads/static/images/options-16.png" class = "options" data-groupid="' + groupID + '" data-userid="' + users[i].userID + '"> </td>';
-                    } else if (users[i]['invited']) {
-                        value += '<tr  class="grey visible" id="User' + users[i].userID + '>' +
-                            '<td class = "first"><span id="userEmail" data-mail="' + users[i].name + '" data-userid="' + users[i].userID + '" >' + users[i].name + ' <span class="smallFont"> (Invited)</span></span></td>' +
-                            '<td class="last right" id="options" data-groupid="' + groupID + '"><img src="./static/plugins/ep_user_pads/static/images/options-16.png" class = "options" data-groupid="' + groupID + '" data-userid="' + users[i].userID + '"> </td>';
-                    } else {
-                        value += '<tr  class="visible" id="User' + users[i].userID + '">' +
-                            '<td class = "first"><span id="userEmail" data-mail="' + users[i].name + '" data-userid="' + users[i].userID + '" >' + users[i]['FullName'] + '</span></td>' +
-                            '<td class="last right" id="options" data-groupid="' + groupID + '"><img src="./static/plugins/ep_user_pads/static/images/options-16.png" class = "options" data-groupid="' + groupID + '" data-userid="' + users[i].userID + '"> </td>';
-                    }
-                    value += '</tr>';
+                var baseClasses = (i % 2 == 1) ? "visible" : "odd visible";
+                var vars = {
+                    user_id: users[i].userID,
+                    user_name: users[i].name,
+                    tr_class: baseClasses,
+                    groupID: groupID,
+                    full_name: users[i]['FullName'],
+                    display_name: users[i]['FullName'],
+                    extra_attribs: '',
+                    status_tag: ''
+                };
+                if (users[i].notRegistered) {
+                    vars.tr_class = "grey visible";
+                    vars.display_name = vars.user_name;
+                    vars.status_tag = '(Invited)';
+                    vars.extra_attribs = 'data-toinvite="1"';
+                } else if (users[i]['role_id'] == 1) {
+                    vars.status_tag = '(Owner)';
+                } else if (users[i]['invited']) {
+                    vars.tr_class = "grey visible";
+                    vars.status_tag = '(Invited)';
+                    vars.display_name = vars.user_name;
                 }
+                var template = '<tr class="%{tr_class}" id="User%{user_id}">' +
+                    '<td class="first"><span id="userEmail" data-mail="%{user_name}" data-userid="%{user_id}" %{extra_attribs}>%{display_name} <span class="smallFont">%{status_tag}</span></span></td>' +
+                    '<td class="last right" id="options"  data-groupid="%{groupID}"><img src="./static/plugins/ep_user_pads/static/images/options-16.png" class = "options" data-groupid="%{groupID}" data-userid="%{user_id}"></td>' +
+                    '</tr>';
+                value += Kiwi.compose(template, vars);
             }
-            value += '</table></div><div class="navigationInfo"><span id="previousPageU" class="pointer"><<</span> <span id="currentPageU"></span> to <span id="currentPageCountU"></span> of <span id="pageCountU"></span> Users <span id="nextPageU" class="pointer">>></span></div>';
+            value += '</table></div><div class="navigationInfo">' +
+                '<span id="previousPageU" class="pointer">&#9664;</span> ' +
+                '<span id="currentPageU"></span> to <span id="currentPageCountU"></span>' +
+                ' of <span id="pageCountU"></span> Users ' +
+                '<span id="nextPageU" class="pointer">&#9654;</span></div>';
         }
         value += '</div></div></div>';
         cb(value);
@@ -493,10 +492,6 @@ $(document).ready(function () {
 
                 $("#reinvite").click(function (e) {
                     e.preventDefault();
-                    //var userID = $(this).data('title');
-                    //var groupID = $(this).parent().parent().parent().parent().find('#overlayOptions').attr('title');
-//					console.log(userID);
-//					console.log(groupID);
                 });
 
             } else {
@@ -517,7 +512,7 @@ $(document).ready(function () {
         $('#searchU').keyup(function () {
             /// search
             $(".content table tr").each(function () {
-                if ($(this).children("td.first").children("a").html().match($("#searchU").val())) {
+                if ($(this).children("td.first").children("span").text().toLowerCase().match($("#searchU").val().toString().toLowerCase())) {
                     $(this).show();
                     $(this).addClass("visible")
                 } else {
@@ -610,6 +605,7 @@ $(document).ready(function () {
          * Initalize the Paging
          */
         var page = 0;
+
         function initPaging(rowsize) {
             // initalize the paging view
             //console.log(rowsize);
@@ -1060,68 +1056,68 @@ $(document).ready(function () {
     });
 
     /*$("#register").click(function () {
-        $("#wrapper").append('<div id="overlay"></div>');
-        $("#wrapper").append('<div id="lightBox"><div id="lightBoxHeader"><span class="close"><img src="../../static/plugins/ep_user_pads/static/images/close-cyan-12.png"></span></div><div id="lightBoxMain"><div class="headline"><img src="./../../static/plugins/ep_user_pads/static/images/user-32.png" class="headlineImage" alt="Register"><h1>Register</h1></div><div class="content">\
-   							  <form id="formEtherpadRegister">\
-    						  <label for="fullname">Full Name</label><div class="inputfield marginBottom"><input type="text" name="fullname" id="fullname" class="smallMarginBottom"></div>\
-    						  <label for="email">E-Mailaddress</label><div class="inputfield marginBottom"><input type="text" name="email" id="email" class="smallMarginBottom"></div>\
-    						  <label for="password">Password</label><div class="inputfield"><input type="password" name="password" id="password" placeholder="Password" class="smallMarginBottom"></div><div class="inputfield marginBottom"><input type="password" name="passwordrepeat" id="passwordrepeat" placeholder="Repeat Password" class="smallMarginBottom"></div>\
-    						  <button type="submit" class="register" id="overlayRegister">Register</button>\
-   							  </form></div></div></div>');
-        $("#lightBox").css("margin-top", -$("#lightBox").height() / 2);
+     $("#wrapper").append('<div id="overlay"></div>');
+     $("#wrapper").append('<div id="lightBox"><div id="lightBoxHeader"><span class="close"><img src="../../static/plugins/ep_user_pads/static/images/close-cyan-12.png"></span></div><div id="lightBoxMain"><div class="headline"><img src="./../../static/plugins/ep_user_pads/static/images/user-32.png" class="headlineImage" alt="Register"><h1>Register</h1></div><div class="content">\
+     <form id="formEtherpadRegister">\
+     <label for="fullname">Full Name</label><div class="inputfield marginBottom"><input type="text" name="fullname" id="fullname" class="smallMarginBottom"></div>\
+     <label for="email">E-Mailaddress</label><div class="inputfield marginBottom"><input type="text" name="email" id="email" class="smallMarginBottom"></div>\
+     <label for="password">Password</label><div class="inputfield"><input type="password" name="password" id="password" placeholder="Password" class="smallMarginBottom"></div><div class="inputfield marginBottom"><input type="password" name="passwordrepeat" id="passwordrepeat" placeholder="Repeat Password" class="smallMarginBottom"></div>\
+     <button type="submit" class="register" id="overlayRegister">Register</button>\
+     </form></div></div></div>');
+     $("#lightBox").css("margin-top", -$("#lightBox").height() / 2);
 
-        // click-event for the closing of the lightBox
-        $(".close").click(function () {
-            $("#overlay").remove();
-            $("#lightBox").remove();
-        });
+     // click-event for the closing of the lightBox
+     $(".close").click(function () {
+     $("#overlay").remove();
+     $("#lightBox").remove();
+     });
 
-        // validation of the login
-        // TODO: correct reaction on the validation
-        $("#formEtherpadRegister").submit(function (e) {
-            e.preventDefault();
-            getBaseURL(null, function (baseurl) {
-                var data = {};
-                data.email = $("#email").val();
-                data.password = $("#password").val();
-                data['FullName'] = $("#fullname").val();
-                data.passwordrepeat = $("#passwordrepeat").val();
+     // validation of the login
+     // TODO: correct reaction on the validation
+     $("#formEtherpadRegister").submit(function (e) {
+     e.preventDefault();
+     getBaseURL(null, function (baseurl) {
+     var data = {};
+     data.email = $("#email").val();
+     data.password = $("#password").val();
+     data['FullName'] = $("#fullname").val();
+     data.passwordrepeat = $("#passwordrepeat").val();
 
-                data.location = baseurl;
-                $.ajax({
-                    type: 'POST',
-                    data: JSON.stringify(data),
-                    contentType: 'application/json',
-                    url: baseurl + 'register',
-                    success: function (data) {
-                        if (data.success)
-                            window.location = "index.html";
-                        else {
-                            console.log(data.error);
-                            $("#formEtherpadRegister input").each(function () {
-                                if ($(this).next().hasClass("errorRight"))
-                                    $(this).next().remove();
-                                if ($(this).is('#email') && !$(this).next().hasClass("errorRight") && (data.error == 'User already Exists' || data.error == 'No valid E-Mail')) {
-                                    $(this).parent().append('<div class="errorRight"><span class="arrowRight"></span>><span lang="en">' + data.error + '</span></div>');
-                                    $(".errorRight").delay(2000).fadeOut(1000);
-                                }
-                                if ($(this).is('#password') && !$(this).next().hasClass("errorRight") && data.error == 'Passwords do not agree') {
-                                    $(this).parent().append('<div class="errorRight"><span class="arrowRight"></span><span lang="en">' + data.error + '</span></div>');
-                                    $(".errorRight").delay(2000).fadeOut(1000);
-                                }
+     data.location = baseurl;
+     $.ajax({
+     type: 'POST',
+     data: JSON.stringify(data),
+     contentType: 'application/json',
+     url: baseurl + 'register',
+     success: function (data) {
+     if (data.success)
+     window.location = "index.html";
+     else {
+     console.log(data.error);
+     $("#formEtherpadRegister input").each(function () {
+     if ($(this).next().hasClass("errorRight"))
+     $(this).next().remove();
+     if ($(this).is('#email') && !$(this).next().hasClass("errorRight") && (data.error == 'User already Exists' || data.error == 'No valid E-Mail')) {
+     $(this).parent().append('<div class="errorRight"><span class="arrowRight"></span>><span lang="en">' + data.error + '</span></div>');
+     $(".errorRight").delay(2000).fadeOut(1000);
+     }
+     if ($(this).is('#password') && !$(this).next().hasClass("errorRight") && data.error == 'Passwords do not agree') {
+     $(this).parent().append('<div class="errorRight"><span class="arrowRight"></span><span lang="en">' + data.error + '</span></div>');
+     $(".errorRight").delay(2000).fadeOut(1000);
+     }
 
-                            });
-//						console.log(data);
-                        }
-                    },
-                    error: function (xhr, ajaxOptions, thrownError) {
-                        console.log(thrownError);
-                    }
-                });
-            });
-        })
+     });
+     //						console.log(data);
+     }
+     },
+     error: function (xhr, ajaxOptions, thrownError) {
+     console.log(thrownError);
+     }
+     });
+     });
+     })
 
-    });*/
+     });*/
 
 
 });

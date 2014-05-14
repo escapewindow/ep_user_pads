@@ -415,7 +415,7 @@ td a:active {
 }
 .navigationInfo {
     text-align: center;
-    font-size: 7pt;
+    font-size: 10pt;
     padding-top: 8px;
 }
 footer a:link,
@@ -428,12 +428,12 @@ footer a:active {
     color: #3C828E;
 }
 .inviteInfo {
-    font-size: 7pt;
+    font-size: 10pt;
     display: block;
     margin-bottom: 30px;
 }
 .deleteInfo {
-    font-size: 7pt;
+    font-size: 10pt;
     display: block;
     margin-bottom: 5px;
 }
