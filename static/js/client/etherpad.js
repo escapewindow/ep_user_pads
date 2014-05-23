@@ -886,18 +886,16 @@ $(document).ready(function () {
                 });
             });
         } else {
-//			console.log('not enter');
         }
     });
 
     $('#openPublicPad').click(function (e) {
         e.preventDefault();
-        var padname = $('#openPadName').val();
-//		console.log('here');
+        var padname = $('#padName').val();
         if (padname.length > 0) {
             window.location = "public_pad/" + padname;
         } else {
-            $("#openPadName").parent().append('<div class="errorUp"><span class="arrowUp"></span><span lang="en">Please enter a name</span></div>');
+            $("#padName").parent().append('<div class="errorUp"><span class="arrowUp"></span><span lang="en">Please enter a name</span></div>');
             $(".errorUp").delay(2000).fadeOut(1000);
         }
     });
