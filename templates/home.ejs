@@ -80,20 +80,21 @@ limitations under the License. -->
             <div style="clear: both"></div>
         </div>
     </div>
-<%- footer%>
+    <%- footer %>
     <!-- Piwik -->
+    <%if (piwik.enabled) {%>
+    <script type="text/javascript" src="<%= piwik.baseUrl + 'piwik.js'%>"></script>
     <script type="text/javascript">
-        var pkBaseURL = (("https:" == document.location.protocol) ? "https://analytics.tugraz.at/" : "http://analytics.tugraz.at/");
-        document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
-    </script><script type="text/javascript">
         try {
-            if (window.location.href.indexOf("etherpad.tugraz.at") >= 0) {
-                var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", 30);
-                piwikTracker.trackPageView();
-                piwikTracker.enableLinkTracking();
-            }
-        } catch( err ) {}
-    </script><noscript><p><img src="http://analytics.tugraz.at/piwik.php?idsite=30" style="border:0" alt="" /></p></noscript>
+            var piwikTracker = Piwik.getTracker("<%= piwik.baseUrl + 'piwik.php'%>", 30);
+            piwikTracker.trackPageView();
+            piwikTracker.enableLinkTracking();
+        } catch (err) {
+            console.error(err)
+        }
+    </script>
+    <noscript><p><img src="<%= piwik.baseUrl %>/piwik.php?idsite=30" style="border:0" alt=""/></p></noscript>
+    <% } %>
     <!-- End Piwik Tracking Code -->
 </div>
 

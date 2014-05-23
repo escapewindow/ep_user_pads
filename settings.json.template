@@ -10,6 +10,10 @@
         "text": "MyMessage",
         "type": "warn"
     },
+    "piwik": {
+        "enabled": false,
+        "baseUrl": "//myurl.com/" 
+    },
     "email": {
         "smtp": "false",
         "user": "mustermann@example.com",

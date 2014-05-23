@@ -30,9 +30,11 @@ var authorManager = require('ep_etherpad-lite/node/db/AuthorManager');
 var sessionManager = require('ep_etherpad-lite/node/db/SessionManager');
 var crypto = require('crypto');
 var pkg = require('./package.json');
-var eMailAuth = require(__dirname + '/settings.json').email;
-var confParams = require(__dirname + '/settings.json').params;
-var confNotify = require(__dirname + '/settings.json').notification;
+var settingsJson = require(__dirname + '/settings.json');
+var eMailAuth = settingsJson.email;
+var confParams = settingsJson.params;
+var confNotify = settingsJson.notification;
+var confPiwik = settingsJson.piwik;
 var express = require('express');
 var formidable = require("formidable");
 
@@ -1139,7 +1141,8 @@ exports.expressCreateServer = function (hook_name, args, cb) {
                     errors: [],
                     username: "",
                     footer: getFooter(),
-                    groups: groups
+                    groups: groups,
+                    piwik: confPiwik
                 };
                 if (currUser) {
                     render_args.username = currUser[0].FullName;
