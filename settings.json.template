@@ -12,7 +12,8 @@
     },
     "piwik": {
         "enabled": false,
-        "baseUrl": "//myurl.com/" 
+        "baseUrl": "//www.my-piwik-url.com/",
+        "site_id": 0
     },
     "email": {
         "smtp": "false",

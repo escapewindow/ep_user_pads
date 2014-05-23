@@ -81,12 +81,13 @@ limitations under the License. -->
         </div>
     </div>
     <%- footer %>
-    <!-- Piwik -->
+    
     <%if (piwik.enabled) {%>
+    <!-- Piwik -->
     <script type="text/javascript" src="<%= piwik.baseUrl + 'piwik.js'%>"></script>
     <script type="text/javascript">
         try {
-            var piwikTracker = Piwik.getTracker("<%= piwik.baseUrl + 'piwik.php'%>", 30);
+            var piwikTracker = Piwik.getTracker("<%= piwik.baseUrl + 'piwik.php'%>", <%= piwik.site_id %>);
             piwikTracker.trackPageView();
             piwikTracker.enableLinkTracking();
         } catch (err) {
@@ -94,8 +95,8 @@ limitations under the License. -->
         }
     </script>
     <noscript><p><img src="<%= piwik.baseUrl %>/piwik.php?idsite=30" style="border:0" alt=""/></p></noscript>
-    <% } %>
     <!-- End Piwik Tracking Code -->
+    <% } %>
 </div>
 
 </body>
