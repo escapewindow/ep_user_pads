@@ -913,10 +913,20 @@ $(document).ready(function () {
 
     $('#createPublicPadRandomName').click(function (e) {
         e.preventDefault();
-        //console.log('here created');
         window.location = "public_pad/" + randomPadName();
     });
 
+    $('#openPublicPad').click(function (e) {
+        e.preventDefault();
+        var padname = $('#padName').val();
+        if (padname.length > 0) {
+            window.location = "public_pad/" + padname;
+        } else {
+            $("#padName").parent().append('<div class="errorUp" style="margin-left:92px"><span class="arrowUp"></span><span lang="en">Please enter a name</span></div>');
+            $(".errorUp").delay(2000).fadeOut(1000);
+        }
+    });
+    
     $('#createPrivateGroupForm').submit(function (e) {
         e.preventDefault();
         var data = {};
@@ -925,7 +935,6 @@ $(document).ready(function () {
             url = baseurl;
             data.location = url;
             data.groupName = $("#groupName").val();
-//			console.log(url);
             post(data, url + 'createGroup', function (data) {
                 if (!data.success) {
                     if (data.error == "Group Name not defined") {
