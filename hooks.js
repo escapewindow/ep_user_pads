@@ -70,7 +70,8 @@ var dbAuthParams = {
     password: dbAuth.password,
     database: dbAuth.database,
     insecureAuth: true,
-    stringifyObjects: true
+    stringifyObjects: true,
+    connectionLimit : confParams.connectionLimit
 };
 var pool = mysql.createPool(dbAuthParams);
 

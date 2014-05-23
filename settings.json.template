@@ -1,7 +1,8 @@
 {
     "params": {
         "theme": "default",
-        "organization": "United Etherpads of the World"
+        "organization": "United Etherpads of the World",
+        "connectionLimit": 20
     },
     "notification": { 
         "enabled": false,
