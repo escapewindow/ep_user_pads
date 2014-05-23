@@ -37,6 +37,7 @@ var confNotify = settingsJson.notification;
 var confPiwik = settingsJson.piwik;
 var express = require('express');
 var formidable = require("formidable");
+var _ = require('highland');
 
 
 /* 
@@ -73,7 +74,7 @@ var dbAuthParams = {
     database: dbAuth.database,
     insecureAuth: true,
     stringifyObjects: true,
-    connectionLimit : confParams.connectionLimit
+    connectionLimit: confParams.connectionLimit
 };
 var pool = mysql.createPool(dbAuthParams);
 
@@ -214,7 +215,7 @@ var userAuthentication = function (username, password, cb) {
 
         encryptPassword(password, foundUser['salt'], function (encrypted) {
             // note: allows login with password or with full pwd hash, to allow direct login after confirmation
-            if ((foundUser['pwd'] == encrypted || foundUser['pwd'] == password) 
+            if ((foundUser['pwd'] == encrypted || foundUser['pwd'] == password)
                 && foundUser['considered'] && foundUser['active']) {
                 // password correct
                 cb(true, foundUser, true, foundUser['considered'], foundUser['active']);
@@ -314,15 +315,16 @@ function getEtherpadGroupFromNormalGroup(id, cb) {
 
 function getPadsOfGroup(id, padname, cb) {
     log('debug', 'getPadsOfGroup');
-    var allPads = [];
     var allSql = "Select * from GroupPads as gp where gp.group_id = ? and gp.pad_name like ?";
     pool.query(allSql, [id, "%" + padname + "%"], function (err, results) {
         if (err) {
             mySqlErrorHandler(err);
             return;
         }
-        results.forEach(function (result) {
-            log('debug', 'getPadsOfGroup result');
+
+        // iterator for found pads
+        var iteratorFkt = function (result, iteratorCallback) {
+            log('debug', 'iteratorFkt result');
             if (result['pad_name'] == "") {
                 return;
             }
@@ -332,11 +334,13 @@ function getPadsOfGroup(id, padname, cb) {
             };
 
             getEtherpadGroupFromNormalGroup(id, function (success, group) {
+                log('debug', 'getEtherpadGroupFromNormalGroup callback');
                 if (!success) {
                     return;
                 }
                 log('debug', 'getEtherpadGroupFromNormalGroup cb');
                 padManager.getPad(group + "$" + pad.name, null, function (err, origPad) {
+                    log('debug', 'padManager.getPad callback');
                     if (err) {
                         log('error', err);
                         return;
@@ -344,12 +348,18 @@ function getPadsOfGroup(id, padname, cb) {
                     pad.isProtected = origPad.isPasswordProtected();
                     origPad.getLastEdit(function (err, lastEdit) {
                         pad.lastedit = converterPad(lastEdit);
-                        allPads.push(pad);
+                        iteratorCallback(null, pad);
                     });
                 });
             });
+        };
+        
+        // begin async execution with highlandjs streams, 5 parallel max
+        var streamIterator = _.wrapCallback(iteratorFkt);
+        var mystream = _(results).map(streamIterator).parallel(5).errors(function (err, push) {
+            log('error', err);
         });
-        cb(allPads);
+        mystream.toArray(cb);
     });
 }
 
@@ -1336,7 +1346,7 @@ exports.expressCreateServer = function (hook_name, args, cb) {
             var sqlRg = "REPLACE INTO UserGroup Values(?, ?, 2)";
             var sqlNrg = "REPLACE INTO NotRegisteredUsersGroups Values(?, ?)";
             var sql = isRegistered ? sqlRg : sqlNrg;
-            var firstParam = isRegistered? users[0].id : eMail;
+            var firstParam = isRegistered ? users[0].id : eMail;
 
             pool.query(sql, [firstParam, group_id], function (err) {
                 if (err) mySqlErrorHandler(err);
