@@ -47,7 +47,7 @@ var node_mailer_transport = nodemailer.createTransport("sendmail");
 /*
  CONSTANTS
  */
-var DEBUG_ENABLED = true;
+var DEBUG_ENABLED = confParams.debugEnabled;
 var USER_EXISTS = 'User already Exists';
 var PASSWORD_WRONG = 'Passwords do not match';
 var NO_VALID_MAIL = 'No valid E-Mail';
