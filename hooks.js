@@ -1571,7 +1571,7 @@ exports.expressCreateServer = function (hook_name, args, cb) {
                 return;
             }
 
-            if (!fields.user_id || fields.user_id == "" || !fields.groupID || fields.groupID == "") {
+            if (!fields.userID || fields.userID == "" || !fields.groupID || fields.groupID == "") {
                 sendError('No User ID or Group ID given', res);
                 return;
             }
@@ -1583,7 +1583,7 @@ exports.expressCreateServer = function (hook_name, args, cb) {
                     return;
                 }
                 var updateUserSql = "UPDATE UserGroup as ug SET ug.role_id = 1 WHERE ug.user_id = ? and ug.group_id = ?";
-                updateSql(updateUserSql, [fields.user_id, fields.groupID], function (success) {
+                updateSql(updateUserSql, [fields.userID, fields.groupID], function (success) {
                     if (!success) {
                         log('error', 'SET role_id = 1 failed');
                         sendError("Server Error");

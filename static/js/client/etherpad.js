@@ -240,6 +240,7 @@ $(document).ready(function () {
      */
 
     function createUserManagement(users, selectedUserVal, groupID, cb) {
+        console.log(users);
         var startVars = {
             selUsersValAttrib: (selectedUserVal == "") ? '' : 'value="' + selectedUserVal + '" ',
             groupID: groupID
@@ -267,7 +268,7 @@ $(document).ready(function () {
             for (var i = 0; i < users.length; i++) {
                 var baseClasses = (i % 2 == 1) ? "visible" : "odd visible";
                 var vars = {
-                    user_id: users[i].userID,
+                    user_id: users[i].id,
                     user_name: users[i].name,
                     tr_class: baseClasses,
                     groupID: groupID,
