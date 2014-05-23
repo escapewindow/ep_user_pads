@@ -1,4 +1,10 @@
--- Dumping structure for table vl_ep_test.grouppads
+
+CREATE TABLE IF NOT EXISTS `groups` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
 CREATE TABLE IF NOT EXISTS `grouppads` (
   `group_id` int(11) unsigned NOT NULL,
   `pad_name` varchar(255) COLLATE utf8_bin NOT NULL,
@@ -7,17 +13,6 @@ CREATE TABLE IF NOT EXISTS `grouppads` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 
-
--- Dumping structure for table vl_ep_test.groups
-CREATE TABLE IF NOT EXISTS `groups` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-
-
-
--- Dumping structure for table vl_ep_test.notregisteredusersgroups
 CREATE TABLE IF NOT EXISTS `notregisteredusersgroups` (
   `email` varchar(255) NOT NULL,
   `group_id` int(11) unsigned NOT NULL,
@@ -27,8 +22,6 @@ CREATE TABLE IF NOT EXISTS `notregisteredusersgroups` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-
--- Dumping structure for table vl_ep_test.user
 CREATE TABLE IF NOT EXISTS `user` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '',
@@ -43,9 +36,6 @@ CREATE TABLE IF NOT EXISTS `user` (
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
-
-
--- Dumping structure for table vl_ep_test.usergroup
 CREATE TABLE IF NOT EXISTS `usergroup` (
   `user_id` int(11) unsigned NOT NULL,
   `group_id` int(11) unsigned NOT NULL,
@@ -57,8 +47,6 @@ CREATE TABLE IF NOT EXISTS `usergroup` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 
-
--- Dumping structure for table vl_ep_test.usersessions
 CREATE TABLE IF NOT EXISTS `usersessions` (
   `session_id` varchar(255) COLLATE utf8_bin NOT NULL,
   `user_id` int(11) unsigned NOT NULL,
