@@ -889,17 +889,6 @@ $(document).ready(function () {
         }
     });
 
-    $('#openPublicPad').click(function (e) {
-        e.preventDefault();
-        var padname = $('#padName').val();
-        if (padname.length > 0) {
-            window.location = "public_pad/" + padname;
-        } else {
-            $("#padName").parent().append('<div class="errorUp"><span class="arrowUp"></span><span lang="en">Please enter a name</span></div>');
-            $(".errorUp").delay(2000).fadeOut(1000);
-        }
-    });
-
     $('#createPublicPadByName').click(function (e) {
         e.preventDefault();
         var padname = $('#createPadName').val();

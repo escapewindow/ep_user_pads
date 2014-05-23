@@ -175,7 +175,6 @@ $(document).ready(function () {
         if (padname.length > 0) {
             window.location = "public_pad/" + padname;
         } else {
-            //$("#padName").css("border-color","#B82349");
             $("#padName").parent().append('<div class="errorUp" style="margin-left:92px"><span class="arrowUp"></span><span lang="en">Please enter a name</span></div>');
             $(".errorUp").delay(2000).fadeOut(1000);
         }
