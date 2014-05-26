@@ -22,7 +22,7 @@ limitations under the License. -->
 </head>
 <body>
 <div id="wrapper">
-    <%- header%>
+    <%- header %>
     <div id="minMax">
         <div id="minimize"><img src="/static/plugins/ep_user_pads/static/images/arrowup-orange-16.png"
                                 id="minMaxArrow"></div>
@@ -48,7 +48,7 @@ limitations under the License. -->
 
     </div>
 
-    <%- footer%>
+    <%- footer %>
 
 </div>
 
@@ -71,14 +71,6 @@ limitations under the License. -->
         });
     }
 
-    var getBaseURL = function (slice, cb) {
-        var loc = document.location,
-                url = loc.protocol + "//" + loc.hostname + ":" + loc.port,
-                pathComponents = location.pathname.split('/'),
-                baseURL = pathComponents.slice(0, pathComponents.length - slice).join('/') + '/';
-        cb(url + baseURL);
-    };
-    
     function validate(tag) {
         $(tag + " input").each(function () {
             if ($(this).val().length < 1) {
@@ -91,7 +83,7 @@ limitations under the License. -->
         });
         return false;
     }
-    
+
     $(document).ready(function () {
         $("#wrapper").append('<div id="overlay"></div>');
         $("#wrapper").append('<div id="lightBox"><div id="lightBoxHeader"></div><div id="lightBoxMain"><div class="headline"><img src="/static/plugins/ep_user_pads/static/images/user-32.png" class="headlineImage" alt="Login"><h1 lang="en">Login</h1></div><div class="content"><div class="overlayLoginArea"><div class="overlayLoginArea"><h3 lang="en">Etherpad Account</h3><button id="loginEtherpad" lang="en">Login</button></div><div style="clear:both"></div></div></div></div>');
@@ -125,50 +117,49 @@ limitations under the License. -->
                 data.email = $("#email").val();
                 data.password = $("#password").val();
                 var url;
-                //getBaseURL(function (baseurl) {
-                getBaseURL(null, function (baseurl) {
-                    url = baseurl;
-                    data.url = baseurl;
-                    $.ajax({
-                        type: 'POST',
-                        data: JSON.stringify(data),
-                        contentType: 'application/json',
-                        url: url + 'login',
-                        success: function (data) {
-                            if (data.success) {
-                                url = baseurl;
-                                data.location = url;
-                                data.groupId = '<%= groupID %>';
-                                data.padname = '<%= padname %>';
-                                console.log(data);
-                                post(data, url + 'directToPad', function (data) {
-                                    if (data.success) {
-                                        document.cookie = "sessionID=" + data.session + "; path=/";
-                                        location.reload();
-                                    } else {
-                                        location.reload();
-                                    }
-                                });
-                                return;
-                            }
-                            
-                            $("#formEtherpadLogin input").each(function () {
-                                if ($(this).next().hasClass("errorRight"))
-                                    $(this).next().remove();
-                                if ($(this).is('#email') && !$(this).next().hasClass("errorRight") && (data.error == 'No registered User' ))
-                                    $(this).parent().append('<div class="errorRight"><img src="/static/plugins/ep_user_pads/static/images/arrowleft-red-16.png" class="arrowleft"><span class="white" lang="en">' + data.error + '</span></div>');
-                                if ($(this).is('#password') && !$(this).next().hasClass("errorRight") && data.error == 'Password is wrong')
-                                    $(this).parent().append('<div class="errorRight"><img src="/static/plugins/ep_user_pads/static/images/arrowleft-red-16.png" class="arrowleft"><span class="white" lang="en">' + data.error + '</span></div>');
+                var baseurl = document.location.origin+'/';
+                console.log('baseurl', baseurl);
+                url = baseurl;
+                data.url = baseurl;
+                $.ajax({
+                    type: 'POST',
+                    data: JSON.stringify(data),
+                    contentType: 'application/json',
+                    url: url + 'login',
+                    success: function (data) {
+                        if (data.success) {
+                            url = baseurl;
+                            data.location = url;
+                            data.groupId = '<%= groupID %>';
+                            data.padname = '<%= padname %>';
+                            console.log(data);
+                            post(data, url + 'directToPad', function (data) {
+                                if (data.success) {
+                                    document.cookie = "sessionID=" + data.session + "; path=/";
+                                    location.reload();
+                                } else {
+                                    location.reload();
+                                }
                             });
-                        },
-                        error: function (xhr, ajaxOptions, thrownError) {
-                            console.log(thrownError);
+                            return;
                         }
-                    });
+
+                        $("#formEtherpadLogin input").each(function () {
+                            if ($(this).next().hasClass("errorRight"))
+                                $(this).next().remove();
+                            if ($(this).is('#email') && !$(this).next().hasClass("errorRight") && (data.error == 'No registered User' ))
+                                $(this).parent().append('<div class="errorRight"><img src="/static/plugins/ep_user_pads/static/images/arrowleft-red-16.png" class="arrowleft"><span class="white" lang="en">' + data.error + '</span></div>');
+                            if ($(this).is('#password') && !$(this).next().hasClass("errorRight") && data.error == 'Password is wrong')
+                                $(this).parent().append('<div class="errorRight"><img src="/static/plugins/ep_user_pads/static/images/arrowleft-red-16.png" class="arrowleft"><span class="white" lang="en">' + data.error + '</span></div>');
+                        });
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        console.log(thrownError);
+                    }
                 });
+                
             });
         });
-    });
 </script>
 </body>
 </html>

@@ -353,7 +353,7 @@ function getPadsOfGroup(id, padname, cb) {
                 });
             });
         };
-        
+
         // begin async execution with highlandjs streams, 5 parallel max
         var streamIterator = _.wrapCallback(iteratorFkt);
         var mystream = _(results).map(streamIterator).parallel(5).errors(function (err, push) {
@@ -1746,7 +1746,7 @@ exports.expressCreateServer = function (hook_name, args, cb) {
                             errors: [],
                             padname: req.params.padID,
                             username: req.session.username,
-                            group_id: req.params.group_id,
+                            groupID: req.params.group_id,
                             groupName: currGroup[0].name,
                             padurl: req.session.baseurl + "p/" + req.params.padID,
                             header: getHeader(req.session.username, ''),
@@ -1836,13 +1836,19 @@ exports.expressCreateServer = function (hook_name, args, cb) {
                     res.send(data);
                     return true;
                 }
+
+                if (!userFound) {
+                    sendError('User or password wrong!', res);
+                    return;
+                }
                 if (!active) {
                     sendError('User is inactive', res);
+                    return;
                 }
-                else if (!userFound || considered) {
+
+                if (considered) {
                     sendError('User or password wrong!', res);
-                }
-                else if (userFound && !considered) {
+                } else {
                     sendError('You have to confirm your registration!', res);
                 }
                 return false;
