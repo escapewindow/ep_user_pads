@@ -14,7 +14,7 @@ If you do that, you can follow this procedure after that:
 1. `cd ep_user_pads`
 2. `npm install`
 3. copy settings.json.template to settings.json
-4. enter correct data in settings.json (see email.json section)
+4. enter correct data in settings.json (see settings.json section)
 5. restart etherpad
 
 Don't forget to create the database tables (with [create_tables.sql](sql/create_tables.sql)) at some point if not already present or migrate from previous versions (with [modify_tables.sql](sql/modify_tables.sql)).
