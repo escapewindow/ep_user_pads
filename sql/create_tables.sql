@@ -1,28 +1,28 @@
 
-CREATE TABLE IF NOT EXISTS `groups` (
+CREATE TABLE IF NOT EXISTS `Groups` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
-CREATE TABLE IF NOT EXISTS `grouppads` (
+CREATE TABLE IF NOT EXISTS `GroupPads` (
   `group_id` int(11) unsigned NOT NULL,
   `pad_name` varchar(255) COLLATE utf8_bin NOT NULL,
   PRIMARY KEY (`group_id`,`pad_name`),
-  CONSTRAINT `FK_grouppads_groups` FOREIGN KEY (`group_id`) REFERENCES `groups` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `FK_GroupPads_Groups` FOREIGN KEY (`group_id`) REFERENCES `Groups` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 
-CREATE TABLE IF NOT EXISTS `notregisteredusersgroups` (
+CREATE TABLE IF NOT EXISTS `NotRegisteredUsersGroups` (
   `email` varchar(255) NOT NULL,
   `group_id` int(11) unsigned NOT NULL,
   PRIMARY KEY (`email`,`group_id`),
-  KEY `FK_notregisteredusersgroups_groups` (`group_id`),
-  CONSTRAINT `FK_notregisteredusersgroups_groups` FOREIGN KEY (`group_id`) REFERENCES `groups` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  KEY `FK_NotRegisteredUsersGroups_Groups` (`group_id`),
+  CONSTRAINT `FK_NotRegisteredUsersGroups_Groups` FOREIGN KEY (`group_id`) REFERENCES `Groups` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-CREATE TABLE IF NOT EXISTS `user` (
+CREATE TABLE IF NOT EXISTS `User` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(255) COLLATE utf8_bin NOT NULL DEFAULT '',
   `pwd` varchar(255) COLLATE utf8_bin DEFAULT NULL,
@@ -36,21 +36,21 @@ CREATE TABLE IF NOT EXISTS `user` (
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
-CREATE TABLE IF NOT EXISTS `usergroup` (
+CREATE TABLE IF NOT EXISTS `UserGroup` (
   `user_id` int(11) unsigned NOT NULL,
   `group_id` int(11) unsigned NOT NULL,
   `role_id` int(11) unsigned NOT NULL,
   PRIMARY KEY (`user_id`,`group_id`),
-  KEY `FK_usergroup_groups` (`group_id`),
-  CONSTRAINT `FK_usergroup_groups` FOREIGN KEY (`group_id`) REFERENCES `groups` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `FK_usergroup_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  KEY `FK_UserGroup_Groups` (`group_id`),
+  CONSTRAINT `FK_UserGroup_Groups` FOREIGN KEY (`group_id`) REFERENCES `Groups` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `FK_UserGroup_User` FOREIGN KEY (`user_id`) REFERENCES `User` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 
-CREATE TABLE IF NOT EXISTS `usersessions` (
+CREATE TABLE IF NOT EXISTS `UserSessions` (
   `session_id` varchar(255) COLLATE utf8_bin NOT NULL,
   `user_id` int(11) unsigned NOT NULL,
   PRIMARY KEY (`session_id`),
-  KEY `FK_usersessions_user` (`user_id`),
-  CONSTRAINT `FK_usersessions_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  KEY `FK_UserSessions_User` (`user_id`),
+  CONSTRAINT `FK_UserSessions_User` FOREIGN KEY (`user_id`) REFERENCES `User` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
