@@ -507,7 +507,7 @@ function checkInvitations(email, userid, cb) {
             cb();
             return;
         }
-        for (var i = 0; i < res.length - 1; i++) {
+        for (var i = 0; i < res.length; i++) {
             notRegisteredUpdate(userid, res[i].group_id, email);
         }
         cb();
