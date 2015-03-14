@@ -2,7 +2,7 @@
 
 User Pads Plugin for EtherPad Lite
 
-A user-management system for Etherpad-Lite.
+A user-management system for Etherpad-Lite. This was originally a merge of the plugins [ep_user_pad](https://github.com/aoberegg/ep_user_pad) and [ep_user_pad_frontend](https://github.com/aoberegg/ep_user_pad_frontend).
 
 ## Installation
 You can clone directly into the node_modules directory of your Etherpad installation. 
