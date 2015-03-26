@@ -182,7 +182,10 @@ function group() {
                 var pad_name = $(e.target).closest(".Name");
                 socket.emit('direct-to-group-pad', 'admin', list.id, pad_name.html(), function (session, group, pad_name) {
                     document.cookie = "sessionID=" + session + "; path=/";
-                    var padurl = url + "p/" + group + "$" + pad_name;
+                    if (!window.location.origin) {
+                      window.location.origin = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port: '');
+                    }
+                    var padurl = window.location.origin + "/" + "p/" + group + "$" + pad_name;
                     window.location.replace(padurl);
 
                 });

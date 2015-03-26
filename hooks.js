@@ -1016,10 +1016,15 @@ exports.socketio = function (hook_name, args, cb) {
 
         // direct-to-group-pad
         socket.on("direct-to-group-pad", function (author, groupid, pad_name, cb) {
-            getEtherpadGroupFromNormalGroup(groupid, function (group) {
+            getEtherpadGroupFromNormalGroup(groupid, function (success, group) {
                 addUserToEtherpad(author, function (etherpad_author) {
                     sessionManager.createSession(group, etherpad_author.authorID, Date.now() + 7200000,
                         function (err, session) {
+                            if (err) {
+                               log('error', 'could not create session');
+                               log('error', err);
+                               return; // break execution
+                            }
                             cb(session.sessionID, group, pad_name);
                         });
                 });
